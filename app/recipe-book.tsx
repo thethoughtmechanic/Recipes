@@ -200,6 +200,7 @@ function RecipeDetail({
               alt={`Paper-collage illustration of ${recipe.title}`}
               fill
               priority
+              unoptimized
               sizes="(max-width: 979px) 100vw, 44vw"
             />
           </figure>
@@ -399,6 +400,8 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
                     src={`/recipes/${recipe.id}.webp`}
                     alt=""
                     fill
+                    unoptimized
+                    priority={index < 3}
                     sizes="(max-width: 679px) 108px, (max-width: 979px) 50vw, 33vw"
                   />
                 </span>
