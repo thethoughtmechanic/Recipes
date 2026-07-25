@@ -8,7 +8,13 @@ import {
   formatTallyTarget,
   scaleFraction,
 } from "../app/scaling.ts";
-import { recipes } from "../app/recipes.ts";
+import {
+  availableCategories,
+  normalizeSearchText,
+  recipeSearchText,
+  stableRecipeNumber,
+} from "../app/library.ts";
+import { categories, recipes } from "../app/recipes.ts";
 
 const projectRoot = fileURLToPath(new URL("..", import.meta.url));
 
@@ -49,4 +55,27 @@ test("every recipe has an optimized paper-collage image", async () => {
       access(`${projectRoot}/public/recipes/${recipe.id}.webp`),
     ),
   );
+});
+
+test("search ignores accents and includes useful recipe metadata", () => {
+  const crepes = recipes.find((recipe) => recipe.id === "weekend-crepes");
+
+  assert.ok(crepes);
+  assert.equal(normalizeSearchText("Crêpes"), "crepes");
+  assert.match(recipeSearchText(crepes), /crepes/);
+  assert.match(recipeSearchText(crepes), /10-inch pan/);
+});
+
+test("empty categories stay out of the filter row", () => {
+  const visible = availableCategories(categories, recipes);
+
+  assert.ok(visible.includes("Sweets"));
+  assert.ok(!visible.includes("Drink"));
+});
+
+test("recipe numbering stays stable after filtering", () => {
+  const crepes = recipes.find((recipe) => recipe.id === "weekend-crepes");
+
+  assert.ok(crepes);
+  assert.equal(stableRecipeNumber(recipes, crepes.id), 3);
 });

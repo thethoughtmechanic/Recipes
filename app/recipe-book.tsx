@@ -1,16 +1,29 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import {
   categories,
   recipes,
-  type Category,
   type Fraction,
   type Ingredient,
   type Recipe,
   type ScaleOption,
 } from "./recipes";
+import {
+  availableCategories,
+  normalizeSearchText,
+  recipeSearchText,
+  stableRecipeNumber,
+  type ActiveCategory,
+} from "./library";
 import {
   formatExactDecimal,
   formatKitchenAmount,
@@ -19,28 +32,10 @@ import {
   scaleFraction,
 } from "./scaling";
 
-type ActiveCategory = "All" | Category;
-
 function recipeFromHash(): string | null {
   if (typeof window === "undefined") return null;
   const id = window.location.hash.replace(/^#recipe=/, "");
   return recipes.some((recipe) => recipe.id === id) ? id : null;
-}
-
-function recipeSearchText(recipe: Recipe): string {
-  const ingredients = recipe.ingredientGroups
-    .flatMap((group) => group.items)
-    .map((ingredient) => ingredient.name)
-    .join(" ");
-
-  return [
-    recipe.title,
-    recipe.category,
-    recipe.tags.join(" "),
-    ingredients,
-  ]
-    .join(" ")
-    .toLowerCase();
 }
 
 function openRecipe(id: string) {
@@ -62,6 +57,85 @@ function metaItems(recipe: Recipe) {
     recipe.heat ? { label: "Heat", value: recipe.heat } : null,
     recipe.time ? { label: "Time", value: recipe.time } : null,
   ].filter((item): item is { label: string; value: string } => Boolean(item));
+}
+
+const subscribeToWakeLockSupport = () => () => {};
+const getWakeLockSupport = () => "wakeLock" in navigator;
+const getServerWakeLockSupport = () => false;
+
+function useScreenWakeLock() {
+  const supported = useSyncExternalStore(
+    subscribeToWakeLockSupport,
+    getWakeLockSupport,
+    getServerWakeLockSupport,
+  );
+  const [active, setActive] = useState(false);
+  const [wanted, setWanted] = useState(false);
+  const wantedRef = useRef(false);
+  const sentinelRef = useRef<WakeLockSentinel | null>(null);
+
+  const requestWakeLock = useCallback(async () => {
+    if (
+      !("wakeLock" in navigator) ||
+      document.visibilityState !== "visible" ||
+      sentinelRef.current
+    ) {
+      return;
+    }
+
+    try {
+      const sentinel = await navigator.wakeLock.request("screen");
+      sentinelRef.current = sentinel;
+      setActive(true);
+      sentinel.addEventListener(
+        "release",
+        () => {
+          if (sentinelRef.current === sentinel) {
+            sentinelRef.current = null;
+          }
+          setActive(false);
+        },
+        { once: true },
+      );
+    } catch {
+      wantedRef.current = false;
+      setWanted(false);
+      setActive(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!supported) return;
+
+    const restoreWhenVisible = () => {
+      if (document.visibilityState === "visible" && wantedRef.current) {
+        void requestWakeLock();
+      }
+    };
+
+    document.addEventListener("visibilitychange", restoreWhenVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", restoreWhenVisible);
+      wantedRef.current = false;
+      void sentinelRef.current?.release();
+      sentinelRef.current = null;
+    };
+  }, [requestWakeLock, supported]);
+
+  const toggle = useCallback(async () => {
+    if (wantedRef.current) {
+      wantedRef.current = false;
+      setWanted(false);
+      await sentinelRef.current?.release();
+      return;
+    }
+
+    wantedRef.current = true;
+    setWanted(true);
+    await requestWakeLock();
+  }, [requestWakeLock]);
+
+  return { supported, active, wanted, toggle };
 }
 
 function IngredientMeasure({
@@ -166,6 +240,7 @@ function RecipeDetail({
     ) ?? recipe.scale.options[0];
   const [target, setTarget] = useState<ScaleOption>(defaultTarget);
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const wakeLock = useScreenWakeLock();
 
   const toggleIngredient = (key: string) => {
     setChecked((current) => {
@@ -183,7 +258,24 @@ function RecipeDetail({
           <span aria-hidden="true">←</span>
           Recipes
         </button>
-        <span className="topbar-count">Misu’s formula book</span>
+        <div className="topbar-actions">
+          {wakeLock.supported ? (
+            <button
+              className="wake-lock-button"
+              type="button"
+              aria-pressed={wakeLock.wanted}
+              onClick={() => void wakeLock.toggle()}
+            >
+              <span className="wake-lock-status" aria-hidden="true">
+                {wakeLock.active ? "●" : "○"}
+              </span>
+              {wakeLock.active ? "Screen awake" : "Keep awake"}
+            </button>
+          ) : null}
+          <span className="topbar-count formula-book-label">
+            Misu’s formula book
+          </span>
+        </div>
       </header>
 
       <article className="recipe-shell">
@@ -203,6 +295,12 @@ function RecipeDetail({
               unoptimized
               sizes="(max-width: 979px) 100vw, 44vw"
             />
+            <figcaption className="recipe-mobile-title">
+              <span className="eyebrow">
+                {recipe.category} · {recipe.tags.join(" · ")}
+              </span>
+              <span className="recipe-mobile-heading">{recipe.title}</span>
+            </figcaption>
           </figure>
           <div className="recipe-meta">
             {metaItems(recipe).map((item) => (
@@ -318,7 +416,11 @@ function RecipeDetail({
 function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ActiveCategory>("All");
-  const normalizedQuery = query.trim().toLowerCase();
+  const normalizedQuery = normalizeSearchText(query.trim());
+  const visibleCategories = useMemo(
+    () => availableCategories(categories, recipes),
+    [],
+  );
 
   const filteredRecipes = useMemo(
     () =>
@@ -332,6 +434,7 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
       }),
     [category, normalizedQuery],
   );
+  const isFiltered = category !== "All" || normalizedQuery.length > 0;
 
   return (
     <main className="recipe-app">
@@ -344,7 +447,11 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
           Misu’s
           <span className="brand-subtitle">Recipe book</span>
         </button>
-        <span className="topbar-count">{recipes.length} formulas</span>
+        <span className="topbar-count" aria-live="polite">
+          {isFiltered
+            ? `${filteredRecipes.length} of ${recipes.length} formulas`
+            : `${recipes.length} formulas`}
+        </span>
       </header>
 
       <div className="home-shell">
@@ -372,7 +479,7 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
             </span>
           </label>
           <div className="filter-row" aria-label="Filter by category">
-            {categories.map((option) => (
+            {visibleCategories.map((option) => (
               <button
                 className="filter-chip"
                 key={option}
@@ -407,7 +514,11 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
                 </span>
                 <span className="recipe-card-copy">
                   <span className="recipe-index">
-                    {String(index + 1).padStart(2, "0")} · {recipe.category}
+                    {String(stableRecipeNumber(recipes, recipe.id)).padStart(
+                      2,
+                      "0",
+                    )}{" "}
+                    · {recipe.category}
                   </span>
                   <span className="recipe-card-title">{recipe.title}</span>
                   <span className="recipe-card-tags">
