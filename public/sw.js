@@ -1,9 +1,12 @@
-const CACHE_NAME = "misus-recipes-v4";
+const CACHE_NAME = "misus-recipes-v5";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
+  "/favicon.ico",
+  "/icon-32.png",
   "/icon-192.png",
   "/icon-512.png",
+  "/apple-touch-icon.png",
 ];
 
 self.addEventListener("install", (event) => {
