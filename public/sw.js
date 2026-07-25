@@ -1,5 +1,10 @@
-const CACHE_NAME = "misus-recipes-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest"];
+const CACHE_NAME = "misus-recipes-v2";
+const APP_SHELL = [
+  "/",
+  "/manifest.webmanifest",
+  "/icon-192.png",
+  "/icon-512.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
