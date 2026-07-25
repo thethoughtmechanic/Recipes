@@ -99,7 +99,7 @@ input:focus-visible {
 .brand-button {
   display: inline-flex;
   gap: 10px;
-  align-items: baseline;
+  align-items: center;
   font-family: var(--font-display), var(--font-display-fallback);
   font-size: 15px;
   font-weight: 800;
@@ -561,6 +561,9 @@ input:focus-visible {
 }
 
 .formula-panel {
+  align-self: start;
+  height: fit-content;
+  min-height: 0;
   background: var(--paper);
   color: var(--ink);
 }
