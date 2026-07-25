@@ -143,7 +143,7 @@ input:focus-visible {
   max-width: 1320px;
   margin: 0 auto;
   padding:
-    clamp(52px, 10vh, 108px)
+    clamp(28px, 5vh, 52px)
     var(--page-gutter)
     calc(96px + env(safe-area-inset-bottom));
 }
@@ -153,7 +153,7 @@ input:focus-visible {
 }
 
 .eyebrow {
-  margin: 0 0 18px;
+  margin: 0 0 12px;
   color: var(--periwinkle);
   font-size: 10px;
   letter-spacing: 0.22em;
@@ -163,26 +163,26 @@ input:focus-visible {
   max-width: 860px;
   margin: 0;
   font-family: var(--font-display), var(--font-display-fallback);
-  font-size: clamp(44px, 9.5vw, 116px);
+  font-size: clamp(40px, 7vw, 76px);
   font-weight: 800;
   letter-spacing: -0.06em;
-  line-height: 0.88;
+  line-height: 0.92;
   text-wrap: balance;
 }
 
 .hero-copy {
   max-width: 610px;
-  margin: 28px 0 0;
+  margin: 16px 0 0;
   color: rgba(226, 221, 208, 0.75);
-  font-size: clamp(17px, 2.2vw, 23px);
-  line-height: 1.45;
+  font-size: clamp(15px, 1.6vw, 18px);
+  line-height: 1.4;
 }
 
 .library-controls {
   display: grid;
-  gap: 18px;
-  margin-top: clamp(46px, 8vw, 80px);
-  padding-top: 24px;
+  gap: 14px;
+  margin-top: clamp(26px, 4vw, 40px);
+  padding-top: 16px;
   border-top: 1px solid rgba(226, 221, 208, 0.18);
 }
 
@@ -263,7 +263,7 @@ input:focus-visible {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1px;
-  margin-top: 30px;
+  margin-top: 20px;
   border: 1px solid rgba(226, 221, 208, 0.16);
   background: rgba(226, 221, 208, 0.16);
 }
@@ -715,6 +715,21 @@ input:focus-visible {
 }
 
 @media (min-width: 680px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+    column-gap: clamp(32px, 6vw, 84px);
+    align-items: end;
+  }
+
+  .hero .eyebrow {
+    grid-column: 1 / -1;
+  }
+
+  .hero-copy {
+    margin: 0 0 4px;
+  }
+
   .library-controls {
     grid-template-columns: minmax(280px, 1fr) auto;
     align-items: end;
@@ -787,6 +802,22 @@ input:focus-visible {
 }
 
 @media (orientation: landscape) and (max-height: 620px) and (max-width: 980px) {
+  .home-shell {
+    padding-top: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(38px, 7vw, 56px);
+  }
+
+  .hero-copy {
+    font-size: 14px;
+  }
+
+  .library-controls {
+    margin-top: 18px;
+  }
+
   .recipe-shell {
     padding-top: 24px;
   }
@@ -817,7 +848,7 @@ input:focus-visible {
 
 @media (max-width: 420px) {
   .hero h1 {
-    font-size: 44px;
+    font-size: 40px;
   }
 
   .recipe-card {
