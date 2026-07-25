@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
   categories,
@@ -187,12 +188,21 @@ function RecipeDetail({
 
       <article className="recipe-shell">
         <header className="recipe-header">
-          <div>
+          <div className="recipe-title-block">
             <p className="eyebrow">
               {recipe.category} · {recipe.tags.join(" · ")}
             </p>
             <h1>{recipe.title}</h1>
           </div>
+          <figure className="recipe-hero-art">
+            <Image
+              src={`/recipes/${recipe.id}.webp`}
+              alt={`Paper-collage illustration of ${recipe.title}`}
+              fill
+              priority
+              sizes="(max-width: 979px) 100vw, 44vw"
+            />
+          </figure>
           <div className="recipe-meta">
             {metaItems(recipe).map((item) => (
               <div className="recipe-meta-item" key={item.label}>
@@ -384,14 +394,19 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
                 type="button"
                 onClick={() => onSelect(recipe.id)}
               >
-                <span className="recipe-mark" aria-hidden="true">
-                  <span>{recipe.mark}</span>
+                <span className="recipe-card-image" aria-hidden="true">
+                  <Image
+                    src={`/recipes/${recipe.id}.webp`}
+                    alt=""
+                    fill
+                    sizes="(max-width: 679px) 108px, (max-width: 979px) 50vw, 33vw"
+                  />
                 </span>
-                <span>
+                <span className="recipe-card-copy">
                   <span className="recipe-index">
                     {String(index + 1).padStart(2, "0")} · {recipe.category}
                   </span>
-                  <h2>{recipe.title}</h2>
+                  <span className="recipe-card-title">{recipe.title}</span>
                   <span className="recipe-card-tags">
                     {recipe.tags.slice(0, 3).map((tag) => (
                       <span className="recipe-tag" key={tag}>

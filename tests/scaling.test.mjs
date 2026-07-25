@@ -1,11 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { access } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import {
   formatExactDecimal,
   formatKitchenAmount,
   formatTallyTarget,
   scaleFraction,
 } from "../app/scaling.ts";
+import { recipes } from "../app/recipes.ts";
+
+const projectRoot = fileURLToPath(new URL("..", import.meta.url));
 
 test("whole-egg scaling keeps exact rational values", () => {
   const flour = scaleFraction(
@@ -34,4 +39,14 @@ test("source fractions stay readable after scaling", () => {
   );
 
   assert.equal(formatKitchenAmount(dashi), "1⅓");
+});
+
+test("every recipe has an optimized paper-collage image", async () => {
+  assert.equal(recipes.length, 15);
+
+  await Promise.all(
+    recipes.map((recipe) =>
+      access(`${projectRoot}/public/recipes/${recipe.id}.webp`),
+    ),
+  );
 });

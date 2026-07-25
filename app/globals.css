@@ -271,10 +271,10 @@ input:focus-visible {
 .recipe-card {
   position: relative;
   display: grid;
-  grid-template-columns: 82px 1fr 28px;
+  grid-template-columns: 108px minmax(0, 1fr) 24px;
   gap: 16px;
   align-items: center;
-  min-height: 132px;
+  min-height: 144px;
   padding: 18px;
   overflow: hidden;
   border: 0;
@@ -295,45 +295,17 @@ input:focus-visible {
   background: var(--bone);
 }
 
-.recipe-mark {
+.recipe-card-image {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: 82px;
-  height: 94px;
+  display: block;
+  width: 108px;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
-  background: var(--accent-light);
-  color: var(--accent);
+  background: var(--warm-black);
 }
 
-.recipe-mark::before,
-.recipe-mark::after {
-  position: absolute;
-  content: "";
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  opacity: 0.55;
-}
-
-.recipe-mark::before {
-  width: 58px;
-  height: 58px;
-}
-
-.recipe-mark::after {
-  width: 34px;
-  height: 34px;
-}
-
-.recipe-mark span {
-  position: relative;
-  z-index: 1;
-  padding: 4px;
-  background: var(--accent-light);
-  font-family: var(--font-display), var(--font-display-fallback);
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+.recipe-card-image img {
+  object-fit: cover;
 }
 
 .tone-moss {
@@ -368,7 +340,8 @@ input:focus-visible {
   letter-spacing: 0.16em;
 }
 
-.recipe-card h2 {
+.recipe-card-title {
+  display: block;
   margin: 0;
   font-family: var(--font-display), var(--font-display-fallback);
   font-size: clamp(20px, 3vw, 27px);
@@ -448,6 +421,19 @@ input:focus-visible {
 .recipe-header .eyebrow {
   margin-bottom: 15px;
   color: var(--accent-light);
+}
+
+.recipe-hero-art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  margin: 0;
+  overflow: hidden;
+  background: var(--warm-black-90);
+}
+
+.recipe-hero-art img {
+  object-fit: cover;
 }
 
 .recipe-meta {
@@ -733,7 +719,27 @@ input:focus-visible {
   }
 
   .recipe-card {
-    min-height: 168px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 0;
+    align-items: stretch;
+    min-height: 340px;
+    padding: 0;
+  }
+
+  .recipe-card-image {
+    width: 100%;
+  }
+
+  .recipe-card-copy {
+    display: block;
+    padding: 20px 22px 52px;
+  }
+
+  .card-arrow {
+    position: absolute;
+    right: 22px;
+    bottom: 20px;
   }
 
   .recipe-meta {
@@ -747,19 +753,16 @@ input:focus-visible {
   }
 
   .recipe-card {
-    grid-template-columns: 92px 1fr 28px;
-    min-height: 184px;
-    padding: 22px;
-  }
-
-  .recipe-mark {
-    width: 92px;
-    height: 116px;
+    min-height: 360px;
   }
 
   .recipe-header {
     grid-template-columns: minmax(0, 1.5fr) minmax(360px, 0.7fr);
     align-items: end;
+  }
+
+  .recipe-meta {
+    grid-column: 1 / -1;
   }
 
   .recipe-body {
@@ -787,6 +790,10 @@ input:focus-visible {
     align-items: end;
   }
 
+  .recipe-meta {
+    grid-column: 1 / -1;
+  }
+
   .recipe-header h1 {
     font-size: clamp(40px, 7vw, 70px);
   }
@@ -808,14 +815,13 @@ input:focus-visible {
   }
 
   .recipe-card {
-    grid-template-columns: 70px 1fr 20px;
+    grid-template-columns: 84px minmax(0, 1fr) 20px;
     gap: 13px;
     padding: 14px;
   }
 
-  .recipe-mark {
-    width: 70px;
-    height: 82px;
+  .recipe-card-image {
+    width: 84px;
   }
 
   .ingredient-row {

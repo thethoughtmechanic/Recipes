@@ -9,6 +9,7 @@ The app keeps the source recipes concise while adding:
 - whole-egg, egg-white, weight, or batch scaling;
 - rational arithmetic so repeating values remain explicit;
 - a separate 0.1g Fellow Tally target;
+- original paper-collage artwork for every recipe;
 - offline access through a service worker.
 
 ## Local development
