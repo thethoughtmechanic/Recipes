@@ -550,8 +550,8 @@ export const recipes: Recipe[] = [
   {
     id: "ginger-slam-milk",
     title: "Ginger Slam Milk",
-    category: "Drink",
-    tags: ["Milk", "Ginger", "Bowl"],
+    category: "Sweets",
+    tags: ["Hong Kong", "Chinese dessert", "Ginger"],
     tone: "periwinkle",
     mark: "1B",
     vessel: "Staub bowl",
