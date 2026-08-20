@@ -692,6 +692,56 @@ export const recipes: Recipe[] = [
     ],
     notes: ["Preheat stainless steel. Low and slow for rise without burning."],
   },
+  {
+    id: "original-plum-torte",
+    title: "Original Plum Torte",
+    category: "Sweets",
+    tags: ["Plum", "Cake", "One bowl"],
+    tone: "periwinkle",
+    mark: "24P",
+    vessel: "8–10-inch springform pan",
+    yield: "8 servings",
+    heat: "350°F",
+    time: "1 hr + cool",
+    scale: fixedScale,
+    ingredientGroups: [
+      {
+        items: [
+          {
+            name: "Granulated sugar",
+            amount: { numerator: 3, denominator: 4 },
+            unit: "cup",
+            note: "up to 1 cup",
+          },
+          {
+            name: "Unsalted butter, softened",
+            amount: { numerator: 1, denominator: 2 },
+            unit: "cup",
+          },
+          { name: "Unbleached flour, sifted", amount: { numerator: 1 }, unit: "cup" },
+          { name: "Baking powder", amount: { numerator: 1 }, unit: "tsp" },
+          { name: "Salt", note: "pinch, optional", scalable: false },
+          { name: "Large eggs", amount: { numerator: 2 }, unit: "eggs" },
+          {
+            name: "Purple plums, pitted and halved",
+            amount: { numerator: 24 },
+            unit: "halves",
+          },
+          {
+            name: "Sugar, lemon juice, and cinnamon",
+            note: "for topping; about 1 tsp cinnamon",
+            scalable: false,
+          },
+        ],
+      },
+    ],
+    notes: [
+      "Cream sugar and butter. Beat in flour, baking powder, optional salt, and eggs.",
+      "Spoon into the springform pan, arrange plums skin-side up, then top with sugar, lemon juice, and cinnamon.",
+      "Bake about 1 hour. Cool before serving; refrigerate or freeze if desired.",
+    ],
+    sourceUrl: "https://cooking.nytimes.com/recipes/3783-original-plum-torte",
+  },
 ];
 
 export const defaultBatchOptions = batchOptions;
