@@ -742,6 +742,79 @@ export const recipes: Recipe[] = [
     ],
     sourceUrl: "https://cooking.nytimes.com/recipes/3783-original-plum-torte",
   },
+  {
+    id: "berry-buttermilk-cake",
+    title: "Berry Buttermilk Cake",
+    category: "Sweets",
+    tags: ["Cake", "Berry", "One bowl"],
+    tone: "cobalt",
+    mark: "2E",
+    vessel: "9-inch square or round pan",
+    yield: "1 cake · 8–10 servings",
+    heat: "350°F",
+    time: "53–58 min",
+    scale: {
+      kind: "egg",
+      label: "Whole eggs",
+      base: { numerator: 2 },
+      options: wholeEggOptions,
+    },
+    ingredientGroups: [
+      {
+        title: "Batter",
+        items: [
+          {
+            name: "Neutral oil",
+            amount: { numerator: 120 },
+            unit: "ml",
+            note: "plus more for the pan",
+          },
+          { name: "Buttermilk or milk", amount: { numerator: 120 }, unit: "ml" },
+          { name: "Large eggs", amount: { numerator: 2 }, unit: "eggs" },
+          { name: "Vanilla extract", amount: { numerator: 1 }, unit: "tbsp" },
+          { name: "Granulated sugar", amount: { numerator: 200 }, unit: "g" },
+          { name: "All-purpose flour", amount: { numerator: 190 }, unit: "g" },
+          {
+            name: "Baking powder",
+            amount: { numerator: 3, denominator: 2 },
+            unit: "tsp",
+          },
+          {
+            name: "Baking soda",
+            amount: { numerator: 1, denominator: 2 },
+            unit: "tsp",
+          },
+          {
+            name: "Kosher salt",
+            amount: { numerator: 1, denominator: 2 },
+            unit: "tsp",
+          },
+        ],
+      },
+      {
+        title: "Berries + finish",
+        items: [
+          {
+            name: "Frozen berries",
+            amount: { numerator: 285 },
+            unit: "g",
+            note: "about 2 cups; any mix, with large pieces quartered",
+          },
+          { name: "All-purpose flour", amount: { numerator: 1 }, unit: "tbsp" },
+          { name: "Granulated sugar", amount: { numerator: 2 }, unit: "tbsp" },
+        ],
+      },
+    ],
+    notes: [
+      "Oil and line the pan with parchment. Whisk the oil, buttermilk, eggs, vanilla, and 200g sugar together.",
+      "Whisk the dry ingredients separately, then stir in the wet mixture just until combined; a few small lumps are fine.",
+      "Toss the berries with 1 tbsp flour, fold them into the batter, and spread in the pan. Sprinkle with the remaining 2 tbsp sugar.",
+      "Bake until deeply golden and a tester comes out clean, 53–58 minutes. Cool slightly before serving.",
+      "Fresh fruit also works. Cherries, mango, or peaches can replace the berries when cut into bite-size pieces.",
+      "Keeps loosely wrapped at room temperature for about 4 days.",
+    ],
+    sourceUrl: "https://cooking.nytimes.com/recipes/1021092-berry-buttermilk-cake",
+  },
 ];
 
 export const defaultBatchOptions = batchOptions;
