@@ -310,6 +310,7 @@ function RecipeDetail({
   const [scaleStatus, setScaleStatus] = useState("");
   const mainRef = useRef<HTMLElement>(null);
   const wakeLock = useScreenWakeLock();
+  const hasGuidance = Boolean(recipe.method?.length || recipe.notes?.length || recipe.sourceUrl);
 
   useEffect(() => {
     mainRef.current?.focus({ preventScroll: true });
@@ -387,7 +388,7 @@ function RecipeDetail({
               fill
               priority
               unoptimized
-              sizes="(max-width: 979px) 100vw, 44vw"
+              sizes="(max-width: 679px) 100vw, 220px"
             />
             <figcaption className="recipe-mobile-title">
               <span className="eyebrow">
@@ -406,7 +407,7 @@ function RecipeDetail({
           </div>
         </header>
 
-        <div className="recipe-body">
+        <div className={`recipe-body${hasGuidance ? " has-guidance" : ""}`}>
           <aside className="recipe-sidebar">
             <ScalePanel
               recipe={recipe}
@@ -417,28 +418,6 @@ function RecipeDetail({
               onResolve={resolveScaleChange}
               status={scaleStatus}
             />
-            {recipe.notes?.length || recipe.sourceUrl ? (
-              <section className="notes-panel">
-                <h2 className="section-label">Notes</h2>
-                {recipe.notes?.length ? (
-                  <ul className="notes-list">
-                    {recipe.notes.map((note) => (
-                      <li key={note}>{note}</li>
-                    ))}
-                  </ul>
-                ) : null}
-                {recipe.sourceUrl ? (
-                  <a
-                    className="source-link"
-                    href={recipe.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Open original source ↗
-                  </a>
-                ) : null}
-              </section>
-            ) : null}
             <p className="screen-note">
               Pan size and cooking time remain source notes. They do not scale
               automatically.
@@ -511,15 +490,34 @@ function RecipeDetail({
                 })}
               </div>
             ))}
-            {recipe.method?.length ? (
-              <section className="method-panel">
-                <h2 className="section-label">Method</h2>
-                <ol className="method-list">
-                  {recipe.method.map((step) => <li key={step}>{step}</li>)}
-                </ol>
-              </section>
-            ) : null}
           </section>
+          {hasGuidance ? (
+            <aside className="recipe-guidance" aria-label="Cooking guidance">
+              {recipe.method?.length ? (
+                <section className="method-panel">
+                  <h2 className="section-label">Method</h2>
+                  <ol className="method-list">
+                    {recipe.method.map((step) => <li key={step}>{step}</li>)}
+                  </ol>
+                </section>
+              ) : null}
+              {recipe.notes?.length || recipe.sourceUrl ? (
+                <section className="notes-panel">
+                  <h2 className="section-label">Notes</h2>
+                  {recipe.notes?.length ? (
+                    <ul className="notes-list">
+                      {recipe.notes.map((note) => <li key={note}>{note}</li>)}
+                    </ul>
+                  ) : null}
+                  {recipe.sourceUrl ? (
+                    <a className="source-link" href={recipe.sourceUrl} target="_blank" rel="noreferrer">
+                      Open original source ↗
+                    </a>
+                  ) : null}
+                </section>
+              ) : null}
+            </aside>
+          ) : null}
         </div>
       </article>
     </main>

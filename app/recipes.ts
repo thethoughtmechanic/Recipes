@@ -117,10 +117,10 @@ export const recipes: Recipe[] = [
       },
     ],
     method: [
-      "Preheat the oven to 425°F with the pan inside while you prepare the batter.",
-      "Whisk the eggs, flour, milk and sugar into a smooth batter. You can make it the night before and refrigerate it; take it out while the oven warms so it can come toward room temperature.",
-      "Add the butter and a splash of neutral oil to the warm pan. Return it to the oven briefly to melt the butter and warm everything through. The pan does not need to be as fiercely hot as it would for Yorkshire puddings.",
-      "Pour the batter into the pan and bake for 12–15 minutes, until puffed. Pan size and time are for the original three-egg recipe; check the bake when making a different batch.",
+      "Heat the oven to 425°F with the pan inside. If you made the batter the night before, take it from the fridge while the oven warms.",
+      "Whisk the eggs, flour, milk and sugar until smooth.",
+      "Add the butter and a splash of neutral oil to the warm pan so the butter does not burn. Return it to the oven briefly to melt the butter. It need not be as hot as for Yorkshire puddings.",
+      "Pour in the batter and bake 12–15 minutes, until puffed. Check the bake when changing the batch size; the pan and time are for the original three-egg formula.",
     ],
   },
   {
