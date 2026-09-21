@@ -58,6 +58,35 @@ test("Dutch Baby preserves its exact formula and separate scale targets", () => 
   assert.equal(oil.amount, undefined);
 });
 
+test("Original Plum Torte scales its metric formula by whole eggs", () => {
+  const recipe = recipes.find((item) => item.id === "original-plum-torte");
+
+  assert.ok(recipe);
+  assert.equal(recipe.scale.kind, "egg");
+  assert.deepEqual(recipe.scale.base, { numerator: 2 });
+
+  const ingredients = recipe.ingredientGroups.flatMap((group) => group.items);
+  const expected = {
+    "Granulated sugar": [150, "225.0"],
+    "Unsalted butter, softened": [115, "172.5"],
+    "Unbleached flour, sifted": [125, "187.5"],
+    "Purple plums, pitted and halved": [450, "675.0"],
+  };
+
+  for (const [name, [baseGrams, threeEggTarget]] of Object.entries(expected)) {
+    const ingredient = ingredients.find((item) => item.name === name);
+    assert.ok(ingredient, name);
+    assert.equal(ingredient.unit, "g");
+    assert.equal(ingredient.amount.numerator, baseGrams);
+    assert.equal(
+      formatTallyTarget(
+        scaleFraction(ingredient.amount, { numerator: 3 }, recipe.scale.base),
+      ),
+      threeEggTarget,
+    );
+  }
+});
+
 test("source fractions stay readable after scaling", () => {
   const dashi = scaleFraction(
     { numerator: 2, denominator: 3 },
