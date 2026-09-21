@@ -37,6 +37,27 @@ test("the Tally target rounds only for the scale display", () => {
   assert.deepEqual(exact, { numerator: 85, denominator: 3 });
 });
 
+test("Dutch Baby preserves its exact formula and separate scale targets", () => {
+  const recipe = recipes.find((item) => item.id === "dutch-baby");
+  const expected = {
+    "All-purpose flour": ["56.667…", "56.7"],
+    "Milk": ["80", "80.0"],
+    "Sugar": ["8", "8.0"],
+    "Unsalted butter": ["38", "38.0"],
+  };
+  for (const [name, values] of Object.entries(expected)) {
+    const ingredient = recipe.ingredientGroups[0].items.find((item) => item.name === name);
+    assert.ok(ingredient, name);
+    const scaled = scaleFraction(ingredient.amount, { numerator: 2 }, recipe.scale.base);
+    assert.deepEqual([formatExactDecimal(scaled), formatTallyTarget(scaled)], values);
+  }
+  const butter = recipe.ingredientGroups[0].items.find((item) => item.name === "Unsalted butter");
+  assert.equal(formatExactDecimal(scaleFraction(butter.amount, { numerator: 3 }, recipe.scale.base)), "57");
+  const oil = recipe.ingredientGroups[0].items.find((item) => item.name === "Neutral oil");
+  assert.equal(oil.scalable, false);
+  assert.equal(oil.amount, undefined);
+});
+
 test("source fractions stay readable after scaling", () => {
   const dashi = scaleFraction(
     { numerator: 2, denominator: 3 },

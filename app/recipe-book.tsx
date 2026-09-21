@@ -39,15 +39,29 @@ function recipeFromHash(): string | null {
 }
 
 function openRecipe(id: string) {
-  window.history.pushState(null, "", `#recipe=${id}`);
+  window.history.pushState({ fromRecipeLibrary: true }, "", `#recipe=${id}`);
   window.dispatchEvent(new HashChangeEvent("hashchange"));
-  window.scrollTo({ top: 0, behavior: "auto" });
+  window.scrollTo({ top: 0, behavior: "instant" });
 }
 
 function closeRecipe() {
-  window.history.pushState(null, "", window.location.pathname);
+  if (window.history.state?.fromRecipeLibrary) {
+    window.history.back();
+    return;
+  }
+  // A direct recipe link has no library entry to return to.
+  window.history.replaceState(null, "", window.location.pathname + window.location.search);
   window.dispatchEvent(new HashChangeEvent("hashchange"));
-  window.scrollTo({ top: 0, behavior: "auto" });
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function scaleLabel(recipe: Recipe, option: ScaleOption) {
+  const singular = option.numerator === (option.denominator ?? 1);
+  if (recipe.scale.kind === "egg") return `${option.label} ${singular ? "egg" : "eggs"}`;
+  if (recipe.scale.kind === "egg-white") return `${option.label} egg ${singular ? "white" : "whites"}`;
+  if (recipe.scale.label === "Bowls") return `${option.label} ${singular ? "bowl" : "bowls"}`;
+  if (recipe.scale.kind === "weight") return `${option.label} of ${recipe.scale.label}`;
+  return option.label;
 }
 
 function metaItems(recipe: Recipe) {
@@ -163,13 +177,19 @@ function IngredientMeasure({
   const value = isGram
     ? formatExactDecimal(scaled)
     : formatKitchenAmount(scaled);
+  const isOne = scaled.numerator === scaled.denominator;
+  const unit = ingredient.unit === "egg" || ingredient.unit === "eggs"
+    ? (isOne ? "egg" : "eggs")
+    : ingredient.unit === "white" || ingredient.unit === "whites"
+      ? (isOne ? "white" : "whites")
+      : ingredient.unit;
 
   return (
     <div className="ingredient-measure">
       <span className="ingredient-value">
         {value}
-        {ingredient.unit ? (
-          <span className="ingredient-unit">{ingredient.unit}</span>
+        {unit ? (
+          <span className="ingredient-unit">{unit}</span>
         ) : null}
       </span>
       {isGram ? (
@@ -187,25 +207,47 @@ function ScalePanel({
   recipe,
   target,
   onChange,
+  pendingTarget,
+  checkedCount,
+  onResolve,
+  status,
 }: {
   recipe: Recipe;
   target: ScaleOption;
   onChange: (option: ScaleOption) => void;
+  pendingTarget: ScaleOption | null;
+  checkedCount: number;
+  onResolve: (choice: "clear" | "keep" | "cancel") => void;
+  status: string;
 }) {
   const factor = formatScaleFactor(target, recipe.scale.base);
+  const panelRef = useRef<HTMLElement>(null);
+  const choiceRef = useRef<HTMLDivElement>(null);
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (pendingTarget) {
+      choiceRef.current?.focus();
+    } else if (wasPending.current) {
+      panelRef.current?.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus();
+    }
+    wasPending.current = Boolean(pendingTarget);
+  }, [pendingTarget]);
 
   return (
-    <section className="scale-panel">
+    <section className="scale-panel" ref={panelRef}>
       <span className="scale-kicker">
         {recipe.scale.kind === "fixed" ? "Formula" : "Scale by"}
       </span>
       <h2 className="scale-title">{recipe.scale.label}</h2>
-      <div className="scale-options" aria-label={`Scale by ${recipe.scale.label}`}>
+      <div className="scale-options" role="group" aria-label={`Scale by ${recipe.scale.label}`}>
         {recipe.scale.options.map((option) => (
           <button
             className="scale-option"
             type="button"
             key={`${option.numerator}/${option.denominator ?? 1}`}
+            aria-label={scaleLabel(recipe, option)}
+            disabled={Boolean(pendingTarget)}
             aria-pressed={
               option.numerator === target.numerator &&
               (option.denominator ?? 1) === (target.denominator ?? 1)
@@ -216,6 +258,30 @@ function ScalePanel({
           </button>
         ))}
       </div>
+      {pendingTarget ? (
+        <div
+          className="scale-confirmation"
+          role="group"
+          aria-labelledby="scale-change-title"
+          aria-describedby="scale-change-description"
+          tabIndex={-1}
+          ref={choiceRef}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") onResolve("cancel");
+          }}
+        >
+          <h3 id="scale-change-title">Change to {scaleLabel(recipe, pendingTarget)}?</h3>
+          <p id="scale-change-description">
+            Amounts will update. {checkedCount} {checkedCount === 1 ? "ingredient is" : "ingredients are"} checked.
+          </p>
+          <div className="scale-confirmation-actions">
+            <button type="button" onClick={() => onResolve("clear")}>Clear checks &amp; change</button>
+            <button type="button" onClick={() => onResolve("keep")}>Keep checks &amp; change</button>
+            <button type="button" onClick={() => onResolve("cancel")}>Cancel</button>
+          </div>
+        </div>
+      ) : null}
+      <p className="scale-status" role="status">{status}</p>
       <p className="scale-explainer">
         {recipe.scale.kind === "fixed"
           ? "This recipe is recorded by feel, so no false precision is added."
@@ -240,7 +306,35 @@ function RecipeDetail({
     ) ?? recipe.scale.options[0];
   const [target, setTarget] = useState<ScaleOption>(defaultTarget);
   const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [pendingTarget, setPendingTarget] = useState<ScaleOption | null>(null);
+  const [scaleStatus, setScaleStatus] = useState("");
+  const mainRef = useRef<HTMLElement>(null);
   const wakeLock = useScreenWakeLock();
+
+  useEffect(() => {
+    mainRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  const requestScaleChange = (option: ScaleOption) => {
+    if (option.numerator === target.numerator && (option.denominator ?? 1) === (target.denominator ?? 1)) return;
+    if (checked.size) {
+      setPendingTarget(option);
+      setScaleStatus("");
+    } else {
+      setTarget(option);
+      setScaleStatus(`Amounts updated for ${scaleLabel(recipe, option)}.`);
+    }
+  };
+
+  const resolveScaleChange = (choice: "clear" | "keep" | "cancel") => {
+    if (!pendingTarget) return;
+    if (choice !== "cancel") {
+      setTarget(pendingTarget);
+      if (choice === "clear") setChecked(new Set());
+      setScaleStatus(`Amounts updated for ${scaleLabel(recipe, pendingTarget)}. ${choice === "clear" ? "Checks cleared." : "Checks kept. Review what you have already measured."}`);
+    }
+    setPendingTarget(null);
+  };
 
   const toggleIngredient = (key: string) => {
     setChecked((current) => {
@@ -252,7 +346,7 @@ function RecipeDetail({
   };
 
   return (
-    <main className={`recipe-app tone-${recipe.tone}`}>
+    <main className={`recipe-app tone-${recipe.tone}`} ref={mainRef} tabIndex={-1} aria-label={recipe.title}>
       <header className="topbar">
         <button className="back-button" type="button" onClick={onBack}>
           <span aria-hidden="true">←</span>
@@ -299,7 +393,7 @@ function RecipeDetail({
               <span className="eyebrow">
                 {recipe.category} · {recipe.tags.join(" · ")}
               </span>
-              <span className="recipe-mobile-heading">{recipe.title}</span>
+              <h1 className="recipe-mobile-heading">{recipe.title}</h1>
             </figcaption>
           </figure>
           <div className="recipe-meta">
@@ -314,7 +408,15 @@ function RecipeDetail({
 
         <div className="recipe-body">
           <aside className="recipe-sidebar">
-            <ScalePanel recipe={recipe} target={target} onChange={setTarget} />
+            <ScalePanel
+              recipe={recipe}
+              target={target}
+              onChange={requestScaleChange}
+              pendingTarget={pendingTarget}
+              checkedCount={checked.size}
+              onResolve={resolveScaleChange}
+              status={scaleStatus}
+            />
             {recipe.notes?.length || recipe.sourceUrl ? (
               <section className="notes-panel">
                 <h2 className="section-label">Notes</h2>
@@ -358,6 +460,9 @@ function RecipeDetail({
                 <span className="section-label">Tap to check</span>
               )}
             </header>
+            {recipe.ingredientGroups.some((group) => group.items.some((ingredient) => ingredient.unit === "g")) ? (
+              <p className="tally-explainer">Tally is the target for a 0.1g scale. The formula amount appears above it.</p>
+            ) : null}
 
             {recipe.ingredientGroups.map((group, groupIndex) => (
               <div
@@ -406,6 +511,14 @@ function RecipeDetail({
                 })}
               </div>
             ))}
+            {recipe.method?.length ? (
+              <section className="method-panel">
+                <h2 className="section-label">Method</h2>
+                <ol className="method-list">
+                  {recipe.method.map((step) => <li key={step}>{step}</li>)}
+                </ol>
+              </section>
+            ) : null}
           </section>
         </div>
       </article>
@@ -414,6 +527,7 @@ function RecipeDetail({
 }
 
 function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
+  const searchRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ActiveCategory>("All");
   const normalizedQuery = normalizeSearchText(query.trim());
@@ -456,11 +570,9 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
 
       <div className="home-shell">
         <section className="hero">
-          <p className="eyebrow">Weights first · Whole eggs · No guesswork</p>
           <h1>Cook by weight.</h1>
           <p className="hero-copy">
-            A personal formula book for exact ratios, sensible batches, and the
-            notes that matter.
+            Your recipes, scaled to what you have.
           </p>
         </section>
 
@@ -469,6 +581,7 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
             <span className="search-label">Find a recipe or ingredient</span>
             <input
               className="search-input"
+              ref={searchRef}
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -499,6 +612,7 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
               <button
                 className={`recipe-card tone-${recipe.tone}`}
                 key={recipe.id}
+                id={`recipe-card-${recipe.id}`}
                 type="button"
                 onClick={() => onSelect(recipe.id)}
               >
@@ -535,9 +649,14 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
               </button>
             ))
           ) : (
-            <p className="empty-state">
-              No recipes match. Try another ingredient or category.
-            </p>
+            <div className="empty-state">
+              <p>No recipes match. Try another ingredient or category.</p>
+              <button className="text-button" type="button" onClick={() => {
+                searchRef.current?.focus();
+                setQuery("");
+                setCategory("All");
+              }}>Clear filters</button>
+            </div>
           )}
         </section>
       </div>
@@ -547,30 +666,51 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
 
 export function RecipeBook() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const libraryPosition = useRef({ scrollY: 0, recipeId: "" });
 
   useEffect(() => {
+    const previousRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
     const syncFromHash = () => setSelectedId(recipeFromHash());
     syncFromHash();
     window.addEventListener("hashchange", syncFromHash);
     window.addEventListener("popstate", syncFromHash);
 
     return () => {
+      window.history.scrollRestoration = previousRestoration;
       window.removeEventListener("hashchange", syncFromHash);
       window.removeEventListener("popstate", syncFromHash);
     };
   }, []);
 
+  useEffect(() => {
+    if (selectedId) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      return;
+    }
+    if (!libraryPosition.current.recipeId) return;
+    const frame = requestAnimationFrame(() => {
+      window.scrollTo({ top: libraryPosition.current.scrollY, behavior: "instant" });
+      document.getElementById(`recipe-card-${libraryPosition.current.recipeId}`)?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [selectedId]);
+
   const selectedRecipe = recipes.find((recipe) => recipe.id === selectedId);
 
-  if (selectedRecipe) {
-    return (
-      <RecipeDetail
+  return (
+    <>
+      <div hidden={Boolean(selectedRecipe)}>
+        <RecipeLibrary onSelect={(id) => {
+          libraryPosition.current = { scrollY: window.scrollY, recipeId: id };
+          openRecipe(id);
+        }} />
+      </div>
+      {selectedRecipe ? <RecipeDetail
         key={selectedRecipe.id}
         recipe={selectedRecipe}
         onBack={closeRecipe}
-      />
-    );
-  }
-
-  return <RecipeLibrary onSelect={openRecipe} />;
+      /> : null}
+    </>
+  );
 }

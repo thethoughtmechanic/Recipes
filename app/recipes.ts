@@ -41,6 +41,7 @@ export type Recipe = {
   time?: string;
   scale: ScaleConfig;
   ingredientGroups: IngredientGroup[];
+  method?: string[];
   notes?: string[];
   sourceUrl?: string;
 };
@@ -111,8 +112,15 @@ export const recipes: Recipe[] = [
           { name: "Milk", amount: { numerator: 120 }, unit: "g" },
           { name: "Sugar", amount: { numerator: 12 }, unit: "g" },
           { name: "Unsalted butter", amount: { numerator: 57 }, unit: "g" },
+          { name: "Neutral oil", note: "a splash for the pan", scalable: false },
         ],
       },
+    ],
+    method: [
+      "Preheat the oven to 425°F with the pan inside while you prepare the batter.",
+      "Whisk the eggs, flour, milk and sugar into a smooth batter. You can make it the night before and refrigerate it; take it out while the oven warms so it can come toward room temperature.",
+      "Add the butter and a splash of neutral oil to the warm pan. Return it to the oven briefly to melt the butter and warm everything through. The pan does not need to be as fiercely hot as it would for Yorkshire puddings.",
+      "Pour the batter into the pan and bake for 12–15 minutes, until puffed. Pan size and time are for the original three-egg recipe; check the bake when making a different batch.",
     ],
   },
   {

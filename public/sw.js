@@ -1,4 +1,4 @@
-const CACHE_NAME = "misus-recipes-v6";
+const CACHE_NAME = "misus-recipes-v7";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
