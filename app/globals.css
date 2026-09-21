@@ -523,6 +523,7 @@ input:focus-visible,
 
 .recipe-guidance {
   align-self: start;
+  min-width: 0;
   background: var(--paper);
   color: var(--ink);
 }
@@ -660,8 +661,8 @@ input:focus-visible,
 
 .formula-panel {
   align-self: start;
+  min-width: 0;
   height: fit-content;
-  min-height: 0;
   background: var(--paper);
   color: var(--ink);
 }
@@ -1175,6 +1176,14 @@ input:focus-visible,
 
   .recipe-body {
     grid-template-columns: minmax(210px, 0.22fr) minmax(330px, 0.4fr) minmax(300px, 0.38fr);
+  }
+
+  .recipe-sidebar {
+    grid-column: 1;
+  }
+
+  .formula-panel {
+    grid-column: 2;
   }
 
   .recipe-meta {
