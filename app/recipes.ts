@@ -845,6 +845,89 @@ export const recipes: Recipe[] = [
     ],
     sourceUrl: "https://cooking.nytimes.com/recipes/1021092-berry-buttermilk-cake",
   },
+  {
+    id: "chewy-brownie-cookies",
+    title: "Chewy Brownie Cookies",
+    category: "Sweets",
+    tags: ["Cookie", "Chocolate", "Brownie"],
+    tone: "deep",
+    mark: "18",
+    vessel: "2 large sheet pans",
+    yield: "18 cookies",
+    heat: "350°F",
+    time: "45 min",
+    scale: {
+      kind: "batch",
+      label: "Batch size",
+      base: { numerator: 1 },
+      options: batchOptions,
+    },
+    ingredientGroups: [
+      {
+        title: "Chocolate base",
+        items: [
+          {
+            name: "Semisweet or bittersweet chocolate, finely chopped",
+            amount: { numerator: 113 },
+            unit: "g",
+          },
+          {
+            name: "Unsweetened cocoa powder",
+            amount: { numerator: 42 },
+            unit: "g",
+          },
+          { name: "Espresso powder", amount: { numerator: 1 }, unit: "tsp" },
+          {
+            name: "Unsalted butter",
+            amount: { numerator: 113 },
+            unit: "g",
+          },
+        ],
+      },
+      {
+        title: "Batter + finish",
+        items: [
+          {
+            name: "Large eggs, room temperature",
+            amount: { numerator: 2 },
+            unit: "eggs",
+          },
+          {
+            name: "Granulated sugar",
+            amount: { numerator: 150 },
+            unit: "g",
+          },
+          {
+            name: "Dark brown sugar, packed",
+            amount: { numerator: 107 },
+            unit: "g",
+          },
+          { name: "Kosher salt", amount: { numerator: 1 }, unit: "tsp" },
+          { name: "Vanilla extract", amount: { numerator: 2 }, unit: "tsp" },
+          {
+            name: "All-purpose flour",
+            amount: { numerator: 90 },
+            unit: "g",
+          },
+          { name: "Flaky sea salt", note: "for finishing", scalable: false },
+        ],
+      },
+    ],
+    method: [
+      "Heat the oven to 350°F. Line two large baking sheets with parchment.",
+      "Combine the chopped chocolate, cocoa and espresso powder in a heatproof bowl. Melt the butter over medium-low heat until bubbly but not browned, about 3 minutes. Pour it over the chocolate without stirring and let it stand while you whip the eggs and sugars.",
+      "Whisk the eggs, granulated sugar, brown sugar and kosher salt on medium-high until pillowy and the sugars have begun to dissolve, 3–5 minutes.",
+      "Stir the chocolate mixture until glossy and smooth. If pieces remain, microwave in 10-second bursts until melted.",
+      "With the mixer on low, add the vanilla and chocolate mixture. Scrape the bowl, add the flour and mix until only a few streaks remain. Finish folding by hand; the batter should be glossy and very thick.",
+      "Working quickly, scoop heaping 2-tablespoon (1-ounce) mounds at least 2 inches apart on the prepared pans.",
+      "Bake 8 minutes, until spreading and shiny. Remove the pans and firmly tap them on the counter a couple of times for cragged, fudgy cookies. Sprinkle with flaky salt and bake 2 minutes more, until shiny and slightly puffed. Cool briefly on the pans, then transfer to a rack.",
+    ],
+    notes: [
+      "Do not shorten the 3–5 minute egg-and-sugar whip; it supplies the structure and shine without chemical leavening.",
+      "Scoop promptly after mixing so the baked cookies retain their glossy tops.",
+    ],
+    sourceUrl: "https://cooking.nytimes.com/recipes/1025868-chewy-brownie-cookies",
+  },
 ];
 
 export const defaultBatchOptions = batchOptions;
