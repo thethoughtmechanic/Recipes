@@ -98,7 +98,7 @@ test("source fractions stay readable after scaling", () => {
 });
 
 test("every recipe has an optimized paper-collage image", async () => {
-  assert.equal(recipes.length, 18);
+  assert.equal(recipes.length, 19);
 
   await Promise.all(
     recipes.map((recipe) =>
