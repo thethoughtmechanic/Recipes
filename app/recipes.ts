@@ -928,6 +928,88 @@ export const recipes: Recipe[] = [
     ],
     sourceUrl: "https://cooking.nytimes.com/recipes/1025868-chewy-brownie-cookies",
   },
+  {
+    id: "butter-rice-cakes",
+    title: "Butter Rice Cakes",
+    category: "Sweets",
+    tags: ["Shanghai butter mochi", "Butter tteok", "Gluten-free"],
+    tone: "gold",
+    mark: "12",
+    vessel: "Standard 12-cup uncoated muffin tin",
+    yield: "12 cakes",
+    heat: "400°F → 375°F · 205°C → 190°C",
+    time: "1 hr 15 min",
+    scale: {
+      kind: "egg",
+      label: "Whole eggs",
+      base: { numerator: 1 },
+      options: wholeEggOptions,
+    },
+    ingredientGroups: [
+      {
+        title: "Batter",
+        items: [
+          {
+            name: "Unsalted butter",
+            amount: { numerator: 84 },
+            unit: "g",
+            note: "melted and cooled slightly",
+          },
+          {
+            name: "Granulated sugar",
+            amount: { numerator: 105 },
+            unit: "g",
+          },
+          { name: "Vanilla extract", amount: { numerator: 2 }, unit: "tsp" },
+          { name: "Honey", amount: { numerator: 1 }, unit: "tsp" },
+          {
+            name: "Fine sea salt",
+            amount: { numerator: 1, denominator: 4 },
+            unit: "tsp",
+          },
+          {
+            name: "Large egg, room temperature",
+            amount: { numerator: 1 },
+            unit: "egg",
+            note: "about 50g without shell",
+          },
+          { name: "Whole milk", amount: { numerator: 224 }, unit: "g" },
+          {
+            name: "Mochiko (sweet rice flour)",
+            amount: { numerator: 270 },
+            unit: "g",
+          },
+        ],
+      },
+      {
+        title: "For the muffin tin",
+        items: [
+          {
+            name: "Unsalted butter",
+            amount: { numerator: 56 },
+            unit: "g",
+            note: "melted; coat every cup generously and evenly",
+          },
+        ],
+      },
+    ],
+    method: [
+      "Heat the oven to 400°F (205°C) with a rack in the middle.",
+      "Melt all of the butter in a small saucepan over medium heat, stirring occasionally, 3–4 minutes. Pour the batter portion into a large bowl; whisk in the sugar, vanilla, honey and salt, then set aside to cool.",
+      "Generously and evenly brush the remaining melted butter into all 12 cups of the muffin tin.",
+      "Whisk the egg into the cooled sugar mixture just until blended, then whisk in the milk. Gradually add the mochiko while whisking and continue until smooth.",
+      "Divide the batter evenly among the buttered cups—about 60g per cup—and smooth the tops if needed. Set the muffin tin on a sheet pan.",
+      "Bake on the middle rack for 10 minutes. Lower the oven to 375°F (190°C) and bake until dark golden brown, 35–40 minutes more.",
+      "Cool in the pan for a few minutes. Loosen each cake with a small offset spatula or very thin paring knife, transfer to a rack and serve warm.",
+    ],
+    notes: [
+      "An uncoated muffin tin gives more even browning than a nonstick tin.",
+      "The generous butter coating creates the crisp, deeply caramelized crust.",
+      "Best eaten the day they are made; the crust softens overnight.",
+      "Also known as Shanghai butter mochi, Shanghai butter rice cakes and butter tteok.",
+    ],
+    sourceUrl: "https://cooking.nytimes.com/recipes/780673425-butter-rice-cakes",
+  },
 ];
 
 export const defaultBatchOptions = batchOptions;
