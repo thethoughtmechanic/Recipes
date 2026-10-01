@@ -383,7 +383,7 @@ function RecipeDetail({
           </div>
           <figure className="recipe-hero-art">
             <Image
-              src={`/recipes/${recipe.id}.${recipe.id === "staub-banana-bread" ? "svg" : "webp"}`}
+              src={`/recipes/${recipe.id}.webp`}
               alt={`Paper-collage illustration of ${recipe.title}`}
               fill
               priority
@@ -616,7 +616,7 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
               >
                 <span className="recipe-card-image" aria-hidden="true">
                   <Image
-                    src={`/recipes/${recipe.id}.${recipe.id === "staub-banana-bread" ? "svg" : "webp"}`}
+                    src={`/recipes/${recipe.id}.webp`}
                     alt=""
                     fill
                     unoptimized
