@@ -83,6 +83,63 @@ export const categories: Array<"All" | Category> = [
 
 export const recipes: Recipe[] = [
   {
+    id: "staub-banana-bread",
+    title: "Moist Banana Bread",
+    category: "Baking",
+    tags: ["Banana", "Not too sweet", "Staub"],
+    tone: "gold",
+    mark: "1E",
+    vessel: "7.5 × 6-inch Staub ceramic baking dish",
+    yield: "1 small loaf · 6–8 pieces",
+    heat: "325°F · 163°C",
+    time: "28–35 min + banana roast",
+    scale: {
+      kind: "batch",
+      label: "Batch size",
+      base: { numerator: 1 },
+      options: batchOptions,
+    },
+    ingredientGroups: [
+      {
+        title: "Roasted banana",
+        items: [
+          { name: "Banana, peeled", amount: { numerator: 205 }, unit: "g", note: "200–210g; slightly underripe is fine" },
+          { name: "Granulated sugar", amount: { numerator: 15 }, unit: "g", note: "from the 55g total" },
+        ],
+      },
+      {
+        title: "Batter",
+        items: [
+          { name: "Granulated sugar", amount: { numerator: 40 }, unit: "g" },
+          { name: "Large egg", amount: { numerator: 1 }, unit: "egg" },
+          { name: "Unsalted butter, melted", amount: { numerator: 45 }, unit: "g" },
+          { name: "Plain Greek yogurt", amount: { numerator: 55 }, unit: "g" },
+          { name: "Vanilla extract", amount: { numerator: 1 }, unit: "tsp" },
+          { name: "All-purpose flour", amount: { numerator: 110 }, unit: "g" },
+          { name: "Whole-wheat flour", amount: { numerator: 15 }, unit: "g", note: "optional; replace with AP flour if preferred" },
+          { name: "Baking powder", amount: { numerator: 3, denominator: 2 }, unit: "tsp" },
+          { name: "Fine salt", amount: { numerator: 1, denominator: 4 }, unit: "tsp" },
+          { name: "Cinnamon", amount: { numerator: 1, denominator: 4 }, unit: "tsp", note: "optional" },
+        ],
+      },
+    ],
+    method: [
+      "Heat the oven to 325°F (163°C). Butter the Staub. Add the banana and 15g sugar; roast 15–20 minutes, stirring and mashing once or twice, until soft, fragrant and lightly caramelized. Transfer to a bowl and cool 5–10 minutes.",
+      "Whisk the remaining 40g sugar into the warm banana. Whisk in the egg, melted butter, Greek yogurt and vanilla.",
+      "In a separate bowl, whisk the flours, baking powder, salt and optional cinnamon.",
+      "Fold the dry ingredients into the wet just until no dry streaks remain. Do not overmix.",
+      "Butter the Staub again, spread in the batter and smooth the top. Bake 28–35 minutes, checking at 27 minutes. Pull when a tester has a few moist crumbs but no wet batter; about 202–205°F (94–96°C) in the center.",
+      "Cool at least 15 minutes before slicing.",
+    ],
+    notes: [
+      "Designed specifically for the 7.5 × 6-inch (20 × 16cm), ~1.1L / 1.25qt Staub ceramic baker.",
+      "55g total sugar keeps this deliberately less sweet while banana and Greek yogurt preserve moisture.",
+      "Roasting is especially useful when the banana is not deeply ripe; do not reduce it into a dry paste.",
+      "No baking soda needed: this formula is designed around baking powder.",
+      "For the moistest result, avoid baking until the tester is completely dry.",
+    ],
+  },
+  {
     id: "dutch-baby",
     title: "Dutch Baby",
     category: "Breakfast",
