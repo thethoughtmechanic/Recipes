@@ -1067,6 +1067,61 @@ export const recipes: Recipe[] = [
     ],
     sourceUrl: "https://cooking.nytimes.com/recipes/780673425-butter-rice-cakes",
   },
+  {
+    id: "overnight-yeasted-waffles",
+    title: "Overnight Yeasted Waffles",
+    category: "Breakfast",
+    tags: ["Egg", "Yeasted", "Overnight", "Waffle"],
+    tone: "gold",
+    mark: "2E",
+    vessel: "F.S. Carbon Rugged I cast-iron waffle baker",
+    yield: "About 6 round waffles",
+    heat: "Waffle iron · fully preheated",
+    time: "15 min + 1–2 hr room-temp rise + 8–16 hr cold ferment",
+    scale: {
+      kind: "egg",
+      label: "Whole eggs",
+      base: { numerator: 2 },
+      options: wholeEggOptions,
+    },
+    ingredientGroups: [
+      {
+        title: "Friday batter",
+        items: [
+          { name: "Large eggs", amount: { numerator: 2 }, unit: "eggs", note: "about 100g without shells" },
+          { name: "All-purpose flour", amount: { numerator: 220 }, unit: "g" },
+          { name: "Cornstarch", amount: { numerator: 20 }, unit: "g", note: "for a crisper shell" },
+          { name: "Milk", amount: { numerator: 340 }, unit: "g", note: "whole or 2%" },
+          { name: "Unsalted butter, melted", amount: { numerator: 85 }, unit: "g" },
+          { name: "Granulated sugar", amount: { numerator: 15 }, unit: "g", note: "deliberately low-sugar" },
+          { name: "Instant yeast", amount: { numerator: 2 }, unit: "g" },
+          { name: "Fine salt", amount: { numerator: 4 }, unit: "g" },
+          { name: "Vanilla extract", amount: { numerator: 5 }, unit: "g", note: "optional" },
+        ],
+      },
+      {
+        title: "Optional cornmeal variation",
+        items: [
+          { name: "Fine or medium cornmeal", amount: { numerator: 25 }, unit: "g", note: "replace 25g of the flour; not part of the base recipe" },
+        ],
+      },
+    ],
+    method: [
+      "Friday afternoon, whisk the flour, cornstarch, sugar, yeast and salt in a large bowl. In another bowl whisk the milk, eggs, melted butter and optional vanilla, then whisk into the dry ingredients until smooth. A few tiny lumps are fine.",
+      "Cover loosely and leave at room temperature for 1–2 hours, until the batter is visibly bubbly and has begun to expand. Do not wait for it to double.",
+      "Stir gently to knock back the largest bubbles, cover well and refrigerate 8–16 hours. Use a bowl with plenty of headroom.",
+      "Saturday morning, preheat the waffle iron thoroughly. Take the batter from the fridge while the iron heats; give it one gentle stir. Nothing needs to be added in the morning.",
+      "Lightly grease the iron for the first waffle if needed. Add enough batter to cover the grid without flooding it, close and cook until deeply golden, crisp and steam has slowed. Start checking around 3–4 minutes, but learn the Rugged I rather than relying on the clock.",
+      "Transfer each waffle directly to a wire rack. Serve immediately, or keep in a 200–250°F (95–120°C) oven on the rack while finishing the batch.",
+    ],
+    notes: [
+      "Yield baseline: the 2-egg batch (about 100g egg) should make roughly 6 waffles in a round 7–8-inch iron like the F.S. Carbon Rugged I; expect about 5–7 depending on how full the grid is. The app's egg scale adjusts the full formula proportionally.",
+      "Low sugar is intentional: 15g is enough to support browning and fermentation without making the waffle itself sweet. Add sweetness at the table.",
+      "Cornstarch replaces part of the flour to reduce gluten and encourage a thin, crisp shell while the yeasted interior stays tender.",
+      "For a cornmeal version, replace 25g of the flour with 25g fine or medium cornmeal. Expect a slightly heartier crunch and corn flavour.",
+      "The first batch is a calibration run for the vintage iron. Note the batter weight per waffle and cook time; those are more useful than a generic waffle-maker setting.",
+    ],
+  },
 ];
 
 export const defaultBatchOptions = batchOptions;
