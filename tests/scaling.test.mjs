@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import {
   formatExactDecimal,
   formatKitchenAmount,
+  formatRecipeYield,
   formatTallyTarget,
   scaleFraction,
 } from "../app/scaling.ts";
@@ -98,7 +99,7 @@ test("source fractions stay readable after scaling", () => {
 });
 
 test("every recipe has an optimized paper-collage image", async () => {
-  assert.equal(recipes.length, 20);
+  assert.equal(recipes.length, 21);
 
   await Promise.all(
     recipes.map((recipe) =>
@@ -127,5 +128,34 @@ test("recipe numbering stays stable after filtering", () => {
   const crepes = recipes.find((recipe) => recipe.id === "weekend-crepes");
 
   assert.ok(crepes);
-  assert.equal(stableRecipeNumber(recipes, crepes.id), 3);
+  assert.equal(stableRecipeNumber(recipes, crepes.id), 4);
+});
+
+
+test("waffle yield follows every whole-egg selection", () => {
+  const recipe = recipes.find((item) => item.id === "overnight-yeasted-waffles");
+  for (const target of recipe.scale.options) {
+    assert.equal(formatRecipeYield(recipe, target), `About ${target.numerator * 3} round waffles`);
+  }
+});
+
+test("counts, ranges, singular units and fractional batch sizes scale", () => {
+  const byId = (id) => recipes.find((item) => item.id === id);
+  assert.equal(formatRecipeYield(byId("weekend-crepes"), { numerator: 1 }), "About 3 crêpes");
+  assert.equal(formatRecipeYield(byId("golden-diner-pancakes"), { numerator: 3 }), "6–9 pan pancakes");
+  assert.equal(formatRecipeYield(byId("berry-buttermilk-cake"), { numerator: 3 }), "12–15 servings");
+  assert.equal(formatRecipeYield(byId("chewy-brownie-cookies"), { numerator: 1, denominator: 2 }), "9 cookies");
+  assert.equal(formatRecipeYield(byId("ginger-slam-milk"), { numerator: 1 }), "1 bowl");
+  assert.equal(formatRecipeYield(byId("ginger-slam-milk"), { numerator: 3 }), "3 bowls");
+  assert.equal(formatRecipeYield(byId("tuile-cookies"), { numerator: 2 }), "About 12–16 small tuiles");
+});
+
+test("pan yields show batch proportions and fixed recipes keep their source yields", () => {
+  const recipe = recipes.find((item) => item.id === "dutch-baby");
+  assert.equal(formatRecipeYield(recipe, { numerator: 3 }), "1 skillet");
+  assert.equal(formatRecipeYield(recipe, { numerator: 2 }), "⅔× original batch");
+  assert.equal(formatRecipeYield(recipe, { numerator: 6 }), "2× original batch");
+  for (const fixed of recipes.filter((item) => item.scale.kind === "fixed")) {
+    assert.equal(formatRecipeYield(fixed, fixed.scale.base), fixed.yield);
+  }
 });

@@ -27,6 +27,7 @@ import {
 import {
   formatExactDecimal,
   formatKitchenAmount,
+  formatRecipeYield,
   formatScaleFactor,
   formatTallyTarget,
   scaleFraction,
@@ -64,9 +65,10 @@ function scaleLabel(recipe: Recipe, option: ScaleOption) {
   return option.label;
 }
 
-function metaItems(recipe: Recipe) {
+function metaItems(recipe: Recipe, target: Fraction) {
+  const yieldValue = formatRecipeYield(recipe, target);
   return [
-    recipe.yield ? { label: "Yield", value: recipe.yield } : null,
+    yieldValue ? { label: "Yield", value: yieldValue } : null,
     recipe.vessel ? { label: "Vessel", value: recipe.vessel } : null,
     recipe.heat ? { label: "Heat", value: recipe.heat } : null,
     recipe.time ? { label: "Time", value: recipe.time } : null,
@@ -398,10 +400,10 @@ function RecipeDetail({
             </figcaption>
           </figure>
           <div className="recipe-meta">
-            {metaItems(recipe).map((item) => (
+            {metaItems(recipe, target).map((item) => (
               <div className="recipe-meta-item" key={item.label}>
                 <span className="recipe-meta-label">{item.label}</span>
-                <span className="recipe-meta-value">{item.value}</span>
+                <span className="recipe-meta-value" aria-live={item.label === "Yield" ? "polite" : undefined}>{item.value}</span>
               </div>
             ))}
           </div>

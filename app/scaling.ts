@@ -1,4 +1,4 @@
-import type { Fraction } from "./recipes";
+import type { Fraction, Recipe } from "./recipes";
 
 export type ScaledAmount = {
   numerator: number;
@@ -107,4 +107,32 @@ export function formatScaleFactor(
 ): string {
   const scaled = scaleFraction({ numerator: 1 }, target, base);
   return formatExactDecimal(scaled);
+}
+
+
+/** Estimate pieces at the same portion size, without treating a pan as a count. */
+export function formatRecipeYield(recipe: Recipe, target: Fraction): string | undefined {
+  if (!recipe.yield || recipe.scale.kind === "fixed") return recipe.yield;
+  const factor = scaleFraction({ numerator: 1 }, target, recipe.scale.base);
+  const count = recipe.yieldCount;
+  if (!count) {
+    return factor.numerator === factor.denominator
+      ? recipe.yield
+      : `${formatKitchenAmount(factor)}× original batch`;
+  }
+
+  const ratio = factor.numerator / factor.denominator;
+  const low = count.amount * ratio;
+  const high = count.maximum === undefined ? undefined : count.maximum * ratio;
+  // Whole pieces are estimates when the formula would produce a partial piece.
+  const rounded = (value: number) => Math.max(1, Math.round(value));
+  const minimum = rounded(low);
+  const maximum = high === undefined ? undefined : rounded(high);
+  const approximate = count.approximate || !Number.isInteger(low) ||
+    (high !== undefined && !Number.isInteger(high));
+  const amount = maximum !== undefined && maximum !== minimum
+    ? `${minimum}–${maximum}` : `${minimum}`;
+  const unit = minimum === 1 && (maximum === undefined || maximum === 1)
+    ? count.unit : count.plural;
+  return `${approximate ? "About " : ""}${amount} ${unit}`;
 }

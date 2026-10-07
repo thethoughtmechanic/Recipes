@@ -28,6 +28,15 @@ export type IngredientGroup = {
   items: Ingredient[];
 };
 
+// Counts refer to the source batch; vessel descriptions stay independent of scaling.
+export type YieldCount = {
+  amount: number;
+  maximum?: number;
+  unit: string;
+  plural: string;
+  approximate?: boolean;
+};
+
 export type Recipe = {
   id: string;
   title: string;
@@ -37,6 +46,7 @@ export type Recipe = {
   mark: string;
   vessel?: string;
   yield?: string;
+  yieldCount?: YieldCount;
   heat?: string;
   time?: string;
   scale: ScaleConfig;
@@ -91,6 +101,7 @@ export const recipes: Recipe[] = [
     mark: "1E",
     vessel: "7.5 × 6-inch Staub ceramic baking dish",
     yield: "1 small loaf · 6–8 pieces",
+    yieldCount: { amount: 6, maximum: 8, unit: "piece", plural: "pieces" },
     heat: "325°F · 163°C",
     time: "28–35 min + banana roast",
     scale: {
@@ -225,6 +236,7 @@ export const recipes: Recipe[] = [
     mark: "3E",
     vessel: "10-inch pan",
     yield: "About 8 crêpes",
+    yieldCount: { amount: 8, unit: "crêpe", plural: "crêpes", approximate: true },
     heat: "Stovetop",
     scale: {
       kind: "egg",
@@ -260,6 +272,7 @@ export const recipes: Recipe[] = [
     mark: "28",
     vessel: "14-well takoyaki pan",
     yield: "2 rounds · 28 pieces",
+    yieldCount: { amount: 28, unit: "piece", plural: "pieces" },
     heat: "Stovetop",
     scale: {
       kind: "egg",
@@ -411,6 +424,7 @@ export const recipes: Recipe[] = [
     tone: "cobalt",
     mark: "1E",
     yield: "1 pancake",
+    yieldCount: { amount: 1, unit: "pancake", plural: "pancakes" },
     heat: "Stovetop",
     scale: {
       kind: "egg",
@@ -451,6 +465,7 @@ export const recipes: Recipe[] = [
     tone: "periwinkle",
     mark: "1E",
     yield: "2–3 pan pancakes",
+    yieldCount: { amount: 2, maximum: 3, unit: "pan pancake", plural: "pan pancakes" },
     heat: "350°F finish",
     scale: {
       kind: "egg",
@@ -590,6 +605,7 @@ export const recipes: Recipe[] = [
     mark: "3E",
     vessel: "12-cup muffin tin",
     yield: "12",
+    yieldCount: { amount: 12, unit: "pudding", plural: "puddings" },
     heat: "425°F",
     time: "12–15 min",
     scale: {
@@ -621,6 +637,7 @@ export const recipes: Recipe[] = [
     mark: "1B",
     vessel: "Staub bowl",
     yield: "1 bowl",
+    yieldCount: { amount: 1, unit: "bowl", plural: "bowls" },
     heat: "Milk at 70–75°C",
     scale: {
       kind: "batch",
@@ -660,6 +677,7 @@ export const recipes: Recipe[] = [
     tone: "cobalt",
     mark: "1W",
     yield: "About 6–8 small tuiles",
+    yieldCount: { amount: 6, maximum: 8, unit: "small tuile", plural: "small tuiles", approximate: true },
     heat: "350°F",
     time: "6–9 min",
     scale: {
@@ -766,6 +784,7 @@ export const recipes: Recipe[] = [
     mark: "2E",
     vessel: "8–10-inch springform pan",
     yield: "8 servings",
+    yieldCount: { amount: 8, unit: "serving", plural: "servings" },
     heat: "350°F",
     time: "1 hr + cool",
     scale: {
@@ -838,6 +857,7 @@ export const recipes: Recipe[] = [
     mark: "2E",
     vessel: "9-inch square or round pan",
     yield: "1 cake · 8–10 servings",
+    yieldCount: { amount: 8, maximum: 10, unit: "serving", plural: "servings" },
     heat: "350°F",
     time: "53–58 min",
     scale: {
@@ -911,6 +931,7 @@ export const recipes: Recipe[] = [
     mark: "18",
     vessel: "2 large sheet pans",
     yield: "18 cookies",
+    yieldCount: { amount: 18, unit: "cookie", plural: "cookies" },
     heat: "350°F",
     time: "45 min",
     scale: {
@@ -994,6 +1015,7 @@ export const recipes: Recipe[] = [
     mark: "12",
     vessel: "Standard 12-cup uncoated muffin tin",
     yield: "12 cakes",
+    yieldCount: { amount: 12, unit: "cake", plural: "cakes" },
     heat: "400°F → 375°F · 205°C → 190°C",
     time: "1 hr 15 min",
     scale: {
@@ -1076,6 +1098,7 @@ export const recipes: Recipe[] = [
     mark: "2E",
     vessel: "F.S. Carbon Rugged I cast-iron waffle baker",
     yield: "About 6 round waffles",
+    yieldCount: { amount: 6, unit: "round waffle", plural: "round waffles", approximate: true },
     heat: "Waffle iron · fully preheated",
     time: "15 min + 1–2 hr room-temp rise + 8–16 hr cold ferment",
     scale: {
@@ -1115,7 +1138,7 @@ export const recipes: Recipe[] = [
       "Transfer each waffle directly to a wire rack. Serve immediately, or keep in a 200–250°F (95–120°C) oven on the rack while finishing the batch.",
     ],
     notes: [
-      "Yield baseline: the 2-egg batch (about 100g egg) should make roughly 6 waffles in a round 7–8-inch iron like the F.S. Carbon Rugged I; expect about 5–7 depending on how full the grid is. The app's egg scale adjusts the full formula proportionally.",
+      "Yield baseline: the 2-egg batch (about 100g egg) should make roughly 6 waffles in a round 7–8-inch iron like the F.S. Carbon Rugged I; expect about 5–7 depending on how full the grid is. The app's egg scale adjusts the full formula and estimated yield proportionally; the Yield above reflects your selected eggs.",
       "Low sugar is intentional: 15g is enough to support browning and fermentation without making the waffle itself sweet. Add sweetness at the table.",
       "Cornstarch replaces part of the flour to reduce gluten and encourage a thin, crisp shell while the yeasted interior stays tender.",
       "For a cornmeal version, replace 25g of the flour with 25g fine or medium cornmeal. Expect a slightly heartier crunch and corn flavour.",
