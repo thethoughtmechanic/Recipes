@@ -26,7 +26,7 @@ checks the scaling behavior against representative formulas.
 
 Collections are optional recipe metadata, rendered once as expandable groups
 within the normal recipe grid; Waffles contains Everyday Crispy,
-Overnight Yeasted, and an unsweetened Liège-style dough trial. The existing overnight formula is
+Overnight Yeasted, and an sweetened Liège-style dough trial without pearl sugar. The existing overnight formula is
 unchanged. Everyday opens on tested V1; V2 remains proposed until cooked.
 
 Every recipe has an Experiment history below its cooking view. Open a snapshot
@@ -43,9 +43,9 @@ history remains in source. Saving failures keep the form open. Corrupt saved
 data is left untouched rather than overwritten.
 
 New source recipes remain in `app/recipes.ts`; optional collections, formula
-labels and seeded snapshots are data-only additions. Liège-style V2 is a complete no-added-sugar dough experiment with kneading,
+labels and seeded snapshots are data-only additions. Liège-style V3 is a complete lightly sweetened dough experiment without pearl sugar with kneading,
 rising, proofing and cooking instructions; it is explicitly untested. The prior
-pearl-sugar concept remains in history as shelved. No backend or authentication was added.
+pearl-sugar concept and unsweetened V2 remain in history as superseded. No backend or authentication was added.
 
 Validation: `pnpm test` builds and runs all scaling and experiment tests;
 `pnpm exec tsc --noEmit` checks types. Browser QA needs the supported Sites

@@ -127,14 +127,14 @@ test("collections contain their recipes once in the normal library order", () =>
   assert.equal(filtered[0].recipes[0].id, "liege-waffles");
 });
 
-test("Liege has a complete unsweetened dough trial with whole-egg scaling", () => {
+test("Liege has a sweetened brioche dough trial without pearl sugar with whole-egg scaling", () => {
   const liege = recipes.find(recipe => recipe.id === "liege-waffles");
   const ingredients = liege.ingredientGroups.flatMap(group => group.items);
   assert.equal(liege.scale.kind, "egg");
   assert.equal(liege.scale.base.numerator, 1);
-  assert.equal(ingredients.length, 7);
-  assert.ok(!ingredients.some(item => /sugar|honey|syrup/i.test(item.name)));
-  const expected = { "All-purpose flour": 150, "Large egg": 1, "2% milk": 60, "Unsalted butter, softened": 45, "Instant yeast": 2, "Fine salt": 2.5, "Vanilla extract": 2 };
+  assert.equal(ingredients.length, 8);
+  assert.ok(!ingredients.some(item => /pearl|cube|honey|syrup/i.test(item.name)));
+  const expected = { "All-purpose flour": 150, "Large egg": 1, "Granulated sugar": 15, "2% milk": 60, "Unsalted butter, softened": 45, "Instant yeast": 2, "Fine salt": 2.5, "Vanilla extract": 2 };
   for (const [name, amount] of Object.entries(expected)) {
     const ingredient = byName(liege, name);
     assert.equal(ingredient.amount.numerator / (ingredient.amount.denominator ?? 1), amount);
@@ -147,6 +147,9 @@ test("Liege has a complete unsweetened dough trial with whole-egg scaling", () =
   assert.match(liege.notes.join(" "), /not yet tested/);
   assert.equal(liege.experiments[0].concept, true);
   assert.equal(liege.experiments[0].status, "rejected");
-  assert.equal(liege.experiments[1].status, "proposed");
-  assert.deepEqual(liege.experiments[1].formula, snapshotFormula(liege));
+  assert.equal(liege.experiments[1].status, "rejected");
+  assert.ok(!liege.experiments[1].formula.ingredientGroups.flatMap(group => group.items).some(item => /sugar/i.test(item.name)));
+  assert.equal(liege.experiments[2].status, "proposed");
+  assert.deepEqual(liege.experiments[2].formula, snapshotFormula(liege));
+  assert.match(liege.method[0], /Dissolve the granulated sugar/);
 });
