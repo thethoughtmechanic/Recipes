@@ -1,3 +1,6 @@
+import { snapshotFormula } from "./experiments.ts";
+import type { Experiment } from "./experiments";
+
 export type Fraction = {
   numerator: number;
   denominator?: number;
@@ -39,6 +42,10 @@ export type YieldCount = {
 
 export type Recipe = {
   id: string;
+  collection?: string;
+  formulaLabel?: string;
+  concept?: boolean;
+  experiments?: Experiment[];
   title: string;
   category: Category;
   tags: string[];
@@ -1091,6 +1098,8 @@ export const recipes: Recipe[] = [
   },
   {
     id: "overnight-yeasted-waffles",
+    collection: "Waffles",
+    formulaLabel: "V1 · Untested",
     title: "Overnight Yeasted Waffles",
     category: "Breakfast",
     tags: ["Egg", "Yeasted", "Overnight", "Waffle"],
@@ -1145,6 +1154,77 @@ export const recipes: Recipe[] = [
       "The first batch is a calibration run for the vintage iron. Note the batter weight per waffle and cook time; those are more useful than a generic waffle-maker setting.",
     ],
   },
+  {
+    id: "everyday-crispy-waffles",
+    collection: "Waffles",
+    formulaLabel: "V1 · Tested · V2 next",
+    title: "Everyday Crispy Waffles",
+    category: "Breakfast",
+    tags: ["Egg", "Baking powder", "Experiment"],
+    tone: "gold",
+    mark: "1E",
+    vessel: "F.S. Carbon Rugged I cast-iron waffle baker",
+    time: "10 min prep + cooking",
+    heat: "Waffle iron · fully preheated",
+    yield: "1-egg trial batch · measure yield on your iron",
+    scale: { kind: "egg", label: "Whole eggs", base: { numerator: 1 }, options: wholeEggOptions },
+    ingredientGroups: [{ items: [
+      { name: "Large egg", amount: { numerator: 1 }, unit: "egg", note: "separate; whip the white for V1" },
+      { name: "Bread flour", amount: { numerator: 70 }, unit: "g" },
+      { name: "Cornstarch", amount: { numerator: 25 }, unit: "g" },
+      { name: "2% milk", amount: { numerator: 125 }, unit: "g" },
+      { name: "Unsalted butter, melted", amount: { numerator: 25 }, unit: "g" },
+      { name: "Granulated sugar", amount: { numerator: 22 }, unit: "g" },
+      { name: "Baking powder", amount: { numerator: 4 }, unit: "g" },
+      { name: "Fine salt", amount: { numerator: 15, denominator: 10 }, unit: "g" },
+      { name: "Vanilla extract", amount: { numerator: 3 }, unit: "g" },
+    ] }],
+    method: [
+      "Preheat the iron thoroughly. Whisk flour, cornstarch, sugar, baking powder and salt together.",
+      "Separate the egg. Whisk yolk, milk, cooled melted butter and vanilla. Stir into the dry mixture just until combined. Whip the white and gently fold in.",
+      "Lightly grease the iron as needed. Add batter without flooding the grid; cook until deeply golden and steam slows.",
+      "Transfer to a wire rack, not a stacked plate. Record texture immediately, then after 2 and 5 minutes.",
+    ],
+    notes: ["V1 was tested October 11, 2026. Excellent initial browning and crispness, but the crust softened rapidly and the inside was chewy. This is the historical baseline, not a validated fluffy formula.", "Open Experiment history to cook V2: all-purpose flour, less milk and a whole egg with no whipping. Keep cook conditions similar to compare results."],
+  },
+  {
+    id: "liege-waffles",
+    collection: "Waffles",
+    formulaLabel: "V1 · Concept",
+    concept: true,
+    title: "Liège Waffles",
+    category: "Breakfast",
+    tags: ["Yeasted dough", "Pearl sugar", "Concept"],
+    tone: "gold",
+    mark: "?",
+    scale: fixedScale,
+    ingredientGroups: [],
+    notes: ["A separate direction: buttery yeasted brioche-style dough with pearl sugar, rather than pourable batter. Quantities and method have not been developed yet.", "Goal: a caramelized exterior with a chewy-tender pastry interior. Expect caramelized-sugar cleanup challenges on the vintage cast-iron baker. Plan the formula here after recipe development in chat."],
+  },
 ];
 
 export const defaultBatchOptions = batchOptions;
+
+// Seeded snapshots are copied once and stay independent of the current formula.
+const everyday = recipes.find(recipe => recipe.id === "everyday-crispy-waffles")!;
+const everydayV1 = snapshotFormula(everyday);
+const everydayV2 = snapshotFormula(everyday);
+everydayV2.ingredientGroups[0].items = everydayV2.ingredientGroups[0].items.map(item =>
+  item.name === "Bread flour" ? { ...item, name: "All-purpose flour" } :
+  item.name === "2% milk" ? { ...item, amount: { numerator: 100 } } :
+  item.name === "Large egg" ? { ...item, note: "whole; no separation or whipping" } : item);
+everydayV2.method = [
+  "Preheat the iron thoroughly. Whisk flour, cornstarch, sugar, baking powder and salt together.",
+  "Whisk the whole egg, milk, cooled melted butter and vanilla. Stir into the dry mixture just until combined; do not separate or whip the egg.",
+  "Lightly grease the iron as needed. Add batter without flooding the grid; cook until deeply golden and steam slows.",
+  "Transfer to a wire rack. Compare texture immediately and after 2 and 5 minutes; record batter weight per waffle and cooking time.",
+];
+everydayV2.notes = ["Experiment design: AP flour, less milk and no whipping are being changed together; this trial cannot isolate which variable caused a result."];
+everyday.experiments = [
+  { id: "everyday-v1", version: "V1", title: "Bread flour test", date: "2026-10-11", status: "tested", hypothesis: "Test crispness and interior texture in the vintage iron.", changes: "Bread flour, 125g milk and a whipped egg white.", observations: "Excellent initial browning and crispness. Crust softened within minutes; interior was chewy rather than fluffy and light.", outcome: "Keep the result as a baseline; try AP flour and less milk without whipping.", formula: everydayV1 },
+  { id: "everyday-v2", version: "V2", title: "AP flour + lower hydration", status: "proposed", hypothesis: "Less gluten and lower hydration may improve tenderness and crispness retention.", changes: "70g AP flour replaces bread flour; milk falls from 125g to 100g. Whole egg, no whipping.", observations: "", outcome: "", formula: everydayV2 },
+];
+const overnight = recipes.find(recipe => recipe.id === "overnight-yeasted-waffles")!;
+overnight.experiments = [{ id: "overnight-v1", version: "V1", title: "Friday prep · Saturday cook", status: "proposed", hypothesis: "Long fermentation may give a delicate crust and richer flavour.", changes: "Existing overnight formula, preserved exactly.", observations: "", outcome: "", formula: snapshotFormula(overnight) }];
+const liege = recipes.find(recipe => recipe.id === "liege-waffles")!;
+liege.experiments = [{ id: "liege-v1", version: "V1", title: "Yeasted brioche dough", status: "proposed", concept: true, hypothesis: "Explore a buttery, caramelized, chewy-tender pastry waffle.", changes: "Enriched dough with pearl sugar; quantities still to develop.", observations: "", outcome: "", formula: snapshotFormula(liege) }];

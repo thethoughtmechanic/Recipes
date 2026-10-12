@@ -1409,3 +1409,39 @@ input:focus-visible,
     transition-duration: 0.01ms !important;
   }
 }
+
+.collections { margin: 0 0 28px; }
+.collection-button { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 5px; padding: 20px 22px; border: 1px solid var(--gold); background: rgba(196,164,62,.08); color: var(--cream); text-align: left; cursor: pointer; }
+.collection-button > span:first-child { font-size: 25px; }
+.collection-button small { grid-column: 1; color: var(--cream); }
+.collection-button > span:last-child { grid-column: 2; grid-row: 1 / 3; align-self: center; font-size: 25px; }
+.collection-button[aria-pressed="true"] { background: rgba(196,164,62,.2); }
+.card-formula-status { display: block; font: 11px var(--font-mono-fallback); margin: 8px 0; line-height: 1.5; }
+.formula-version { grid-column: 1 / -1; font: 12px var(--font-mono-fallback); margin: 0; }
+.experiment-notebook { margin-top: 38px; border-top: 1px solid var(--rule); padding: 28px clamp(18px,4vw,40px); background: var(--paper); color: var(--ink); }
+.notebook-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+.notebook-heading h2 { margin: 5px 0 10px; font-size: 28px; }
+.notebook-note { font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
+.notebook-button { border: 1px solid var(--ink-soft); background: transparent; color: var(--ink); padding: 12px 16px; min-height: 44px; cursor: pointer; font-size: 14px; }
+.notebook-button:disabled { opacity: .5; cursor: default; }
+.notebook-button:focus-visible, .experiment-notebook summary:focus-visible, .cook-log textarea:focus-visible, .cook-log select:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 3px; }
+.experiment-list { margin-top: 20px; }
+.experiment-list details { border-top: 1px solid var(--rule); }
+.experiment-list summary { padding: 18px 0; cursor: pointer; line-height: 1.5; }
+.experiment-status { display: block; margin-top: 5px; font: 11px var(--font-mono-fallback); line-height: 1.6; text-transform: capitalize; }
+.experiment-content { padding-bottom: 20px; font-size: 15px; line-height: 1.6; }
+.experiment-content p, .experiment-content h3 { overflow-wrap: anywhere; }
+.snapshot-ingredients { list-style: none; padding: 0; }
+.snapshot-ingredients li { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--rule); padding: 8px 0; }
+.snapshot-ingredients li > span:last-child { flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.snapshot-ingredients small { display: block; color: var(--ink-soft); }
+.notebook-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.promotion-confirmation, .cook-log { background: var(--cream-soft); padding: 20px; margin-top: 18px; }
+.cook-log label { display: grid; gap: 7px; margin: 16px 0; font-size: 14px; }
+.cook-log input, .cook-log textarea, .cook-log select { width: 100%; max-width: 100%; border: 1px solid var(--rule); padding: 12px; background: var(--paper); color: var(--ink); font: inherit; border-radius: 0; }
+.cook-log textarea { min-height: 90px; resize: vertical; }
+.notebook-message:empty { display: none; }
+.notebook-message { color: #7b2f21; }
+
+.concept-body .recipe-guidance { grid-column: 1 / -1; }
+.formula-version { padding: 10px 12px; background: var(--warm-black-90); }

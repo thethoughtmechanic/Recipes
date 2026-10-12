@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { ExperimentNotebook } from "./experiment-notebook";
+import { NOTEBOOK_KEY, appendExperiment, notebookFor, parseNotebooks, preferredRecipe, promoteExperiment, type Experiment, type Notebook, type Notebooks } from "./experiments";
 import {
   useCallback,
   useEffect,
@@ -295,10 +297,17 @@ function ScalePanel({
 
 function RecipeDetail({
   recipe,
-  onBack,
+  onBack, notebook, selectedExperimentId, onViewExperiment, onSaveExperiment, onPromoteExperiment, notebookError, notebookReady,
 }: {
   recipe: Recipe;
   onBack: () => void;
+  notebook: Notebook;
+  selectedExperimentId?: string;
+  onViewExperiment: (id?: string) => void;
+  onSaveExperiment: (experiment: Experiment) => boolean;
+  onPromoteExperiment: (id: string) => void;
+  notebookError: string;
+  notebookReady: boolean;
 }) {
   const defaultTarget =
     recipe.scale.options.find(
@@ -400,6 +409,7 @@ function RecipeDetail({
             </figcaption>
           </figure>
           <div className="recipe-meta">
+            {recipe.formulaLabel && <p className="formula-version">{recipe.formulaLabel}</p>}
             {metaItems(recipe, target).map((item) => (
               <div className="recipe-meta-item" key={item.label}>
                 <span className="recipe-meta-label">{item.label}</span>
@@ -409,9 +419,9 @@ function RecipeDetail({
           </div>
         </header>
 
-        <div className={`recipe-body${hasGuidance ? " has-guidance" : ""}`}>
-          <aside className="recipe-sidebar">
-            <ScalePanel
+        <div className={`recipe-body${hasGuidance ? " has-guidance" : ""}${recipe.concept ? " concept-body" : ""}`}>
+          {!recipe.concept && <aside className="recipe-sidebar">
+            {!recipe.concept && <ScalePanel
               recipe={recipe}
               target={target}
               onChange={requestScaleChange}
@@ -419,14 +429,14 @@ function RecipeDetail({
               checkedCount={checked.size}
               onResolve={resolveScaleChange}
               status={scaleStatus}
-            />
+            />}
             <p className="screen-note">
               Pan size and cooking time remain source notes. They do not scale
               automatically.
             </p>
-          </aside>
+          </aside>}
 
-          <section className="formula-panel">
+          {!recipe.concept && <section className="formula-panel">
             <header className="formula-header">
               <h2 className="section-label">Ingredients</h2>
               {checked.size ? (
@@ -492,7 +502,7 @@ function RecipeDetail({
                 })}
               </div>
             ))}
-          </section>
+          </section>}
           {hasGuidance ? (
             <aside className="recipe-guidance" aria-label="Cooking guidance">
               {recipe.method?.length ? (
@@ -521,15 +531,18 @@ function RecipeDetail({
             </aside>
           ) : null}
         </div>
+        <ExperimentNotebook recipe={recipe} notebook={notebook} target={target} selectedId={selectedExperimentId} onView={onViewExperiment} onSave={onSaveExperiment} onPromote={onPromoteExperiment} error={notebookError} ready={notebookReady} />
       </article>
     </main>
   );
 }
 
-function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
+function RecipeLibrary({ onSelect, saved }: { onSelect: (id: string) => void; saved: Notebooks }) {
   const searchRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ActiveCategory>("All");
+  const [collection, setCollection] = useState<string | null>(null);
+  const collections = Array.from(new Set(recipes.map(recipe => recipe.collection).filter((value): value is string => Boolean(value))));
   const normalizedQuery = normalizeSearchText(query.trim());
   const visibleCategories = useMemo(
     () => availableCategories(categories, recipes),
@@ -544,11 +557,11 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
         const queryMatch =
           normalizedQuery.length === 0 ||
           recipeSearchText(recipe).includes(normalizedQuery);
-        return categoryMatch && queryMatch;
+        return categoryMatch && queryMatch && (!collection || recipe.collection === collection);
       }),
-    [category, normalizedQuery],
+    [category, normalizedQuery, collection],
   );
-  const isFiltered = category !== "All" || normalizedQuery.length > 0;
+  const isFiltered = category !== "All" || normalizedQuery.length > 0 || Boolean(collection);
 
   return (
     <main className="recipe-app">
@@ -606,6 +619,13 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
           </div>
         </section>
 
+        <section className="collections" aria-label="Recipe collections">
+          {collections.map(name => {
+            const members = recipes.filter(recipe => recipe.collection === name);
+            const active = members.filter(recipe => notebookFor(recipe, saved).experiments.some(experiment => experiment.status === "proposed" && !experiment.concept && !notebookFor(recipe, saved).experiments.some(cook => cook.version === experiment.version && ["tested", "preferred", "rejected"].includes(cook.status)))).length;
+            return <button type="button" className="collection-button" key={name} aria-pressed={collection === name} onClick={() => setCollection(collection === name ? null : name)}><span>{name}</span><small>{members.length} recipes · {active} active {active === 1 ? "experiment" : "experiments"}</small><span aria-hidden="true">{collection === name ? "×" : "→"}</span></button>;
+          })}
+        </section>
         <section className="recipe-grid" aria-live="polite">
           {filteredRecipes.length ? (
             filteredRecipes.map((recipe, index) => (
@@ -635,6 +655,7 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
                     · {recipe.category}
                   </span>
                   <span className="recipe-card-title">{recipe.title}</span>
+                  {preferredRecipe(recipe, notebookFor(recipe, saved)).formulaLabel && <span className="card-formula-status">{preferredRecipe(recipe, notebookFor(recipe, saved)).formulaLabel}</span>}
                   <span className="recipe-card-tags">
                     {recipe.tags.slice(0, 3).map((tag) => (
                       <span className="recipe-tag" key={tag}>
@@ -655,6 +676,7 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
                 searchRef.current?.focus();
                 setQuery("");
                 setCategory("All");
+                setCollection(null);
               }}>Clear filters</button>
             </div>
           )}
@@ -666,6 +688,19 @@ function RecipeLibrary({ onSelect }: { onSelect: (id: string) => void }) {
 
 export function RecipeBook() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [saved, setSaved] = useState<Notebooks>({});
+  const [notebookReady, setNotebookReady] = useState(false);
+  const [notebookError, setNotebookError] = useState("");
+  const [view, setView] = useState<{ recipeId: string; experimentId?: string }>();
+  useEffect(() => {
+    try { setSaved(parseNotebooks(localStorage.getItem(NOTEBOOK_KEY))); setNotebookReady(true); }
+    catch { setNotebookError("Saved notebook could not be read. It has been left untouched."); }
+  }, []);
+
+  function persist(next: Notebooks): boolean {
+    try { localStorage.setItem(NOTEBOOK_KEY, JSON.stringify(next)); setSaved(next); setNotebookError(""); return true; }
+    catch { setNotebookError("Your notebook could not be saved on this device. Keep this page open and try again."); return false; }
+  }
   const libraryPosition = useRef({ scrollY: 0, recipeId: "" });
 
   useEffect(() => {
@@ -696,20 +731,39 @@ export function RecipeBook() {
     return () => cancelAnimationFrame(frame);
   }, [selectedId]);
 
-  const selectedRecipe = recipes.find((recipe) => recipe.id === selectedId);
+  const sourceRecipe = recipes.find((recipe) => recipe.id === selectedId);
+  const notebook = sourceRecipe ? notebookFor(sourceRecipe, saved) : { experiments: [] };
+  const viewedExperiment = view?.recipeId === selectedId ? notebook.experiments.find(experiment => experiment.id === view.experimentId) : undefined;
+  const selectedRecipe = sourceRecipe ? viewedExperiment ? { ...sourceRecipe, ...viewedExperiment.formula, concept: viewedExperiment.concept, formulaLabel: `${viewedExperiment.version} · ${viewedExperiment.status === "proposed" ? "Proposed · Untested" : viewedExperiment.status}` } : preferredRecipe(sourceRecipe, notebook) : undefined;
 
   return (
     <>
       <div hidden={Boolean(selectedRecipe)}>
-        <RecipeLibrary onSelect={(id) => {
+        <RecipeLibrary saved={saved} onSelect={(id) => {
+          setView(undefined);
           libraryPosition.current = { scrollY: window.scrollY, recipeId: id };
           openRecipe(id);
         }} />
       </div>
       {selectedRecipe ? <RecipeDetail
-        key={selectedRecipe.id}
+        key={`${selectedRecipe.id}-${viewedExperiment?.id ?? notebook.preferredId ?? "current"}`}
         recipe={selectedRecipe}
         onBack={closeRecipe}
+        notebook={notebook}
+        notebookReady={notebookReady}
+        notebookError={notebookError}
+        selectedExperimentId={viewedExperiment?.id}
+        onViewExperiment={id => setView({ recipeId: selectedRecipe.id, experimentId: id })}
+        onSaveExperiment={experiment => {
+          return persist(appendExperiment(sourceRecipe!, saved, experiment));
+        }}
+        onPromoteExperiment={id => {
+          const promoted = promoteExperiment(notebook, id);
+          const local = saved[selectedRecipe.id] ?? { experiments: [] };
+          if (persist({ ...saved, [selectedRecipe.id]: { ...local, preferredId: promoted.preferredId } })) {
+            setView(undefined);
+          }
+        }}
       /> : null}
     </>
   );

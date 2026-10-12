@@ -22,6 +22,7 @@ export function recipeSearchText(recipe: Recipe): string {
     [
       recipe.title,
       recipe.category,
+      recipe.collection ?? "",
       recipe.tags.join(" "),
       recipe.vessel ?? "",
       recipe.heat ?? "",

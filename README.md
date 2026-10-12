@@ -21,3 +21,35 @@ pnpm dev
 
 Run `pnpm test` before publishing. It builds the Cloudflare/Vinext app and
 checks the scaling behavior against representative formulas.
+
+## Recipe experiments
+
+Collections are optional recipe metadata; Waffles contains Everyday Crispy,
+Overnight Yeasted, and a Liège concept. The existing overnight formula is
+unchanged. Everyday opens on tested V1; V2 remains proposed until cooked.
+
+Every recipe has an Experiment history below its cooking view. Open a snapshot
+with **Cook this version**, use the existing scale/checklists, then **Log this
+cook**. The form captures the selected batch, lets you correct quantities and
+method steps, and records date, changes, observations, outcome and status.
+Only a tested snapshot can be deliberately promoted with **Make preferred**.
+Historical formulas and the original baseline are kept independently.
+
+Notebook entries and preferred formulas use browser localStorage. They work
+offline after the app has loaded, stay on that browser/device, and do not sync
+between devices. Clearing site data removes personal entries; seeded waffle
+history remains in source. Saving failures keep the form open. Corrupt saved
+data is left untouched rather than overwritten.
+
+New source recipes remain in `app/recipes.ts`; optional collections, formula
+labels and seeded snapshots are data-only additions. Liège is deliberately a
+concept without invented quantities. No backend or authentication was added.
+
+Validation: `pnpm test` builds and runs all scaling and experiment tests;
+`pnpm exec tsc --noEmit` checks types. Browser QA needs the supported Sites
+control-browser environment.
+
+Artwork: the two new assets in `public/recipes/` were generated with the built-in
+imagegen tool using layered torn-paper food collage, ivory paper, cobalt and
+periwinkle cloth. Everyday depicts round golden batter waffles with butter;
+Liège depicts irregular caramelized brioche waffles with pearl sugar.
