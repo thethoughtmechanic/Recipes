@@ -1190,16 +1190,45 @@ export const recipes: Recipe[] = [
   {
     id: "liege-waffles",
     collection: "Waffles",
-    formulaLabel: "V1 · Concept",
-    concept: true,
-    title: "Liège Waffles",
+    formulaLabel: "V2 · Untested",
+    title: "Liège-style Dough Waffles",
     category: "Breakfast",
-    tags: ["Yeasted dough", "Pearl sugar", "Concept"],
+    tags: ["Yeasted dough", "No added sugar", "Brioche-style"],
     tone: "gold",
-    mark: "?",
-    scale: fixedScale,
-    ingredientGroups: [],
-    notes: ["A separate direction: buttery yeasted brioche-style dough with pearl sugar, rather than pourable batter. Quantities and method have not been developed yet.", "Goal: a caramelized exterior with a chewy-tender pastry interior. Expect caramelized-sugar cleanup challenges on the vintage cast-iron baker. Plan the formula here after recipe development in chat."],
+    mark: "1E",
+    vessel: "F.S. Carbon Rugged I cast-iron waffle baker",
+    yield: "About 4 small dough waffles",
+    yieldCount: { amount: 4, unit: "small dough waffle", plural: "small dough waffles", approximate: true },
+    heat: "Waffle iron · medium heat if adjustable",
+    time: "20 min prep + 1½–3 hr rise + 30–60 min proof + cooking",
+    scale: { kind: "egg", label: "Whole eggs", base: { numerator: 1 }, options: wholeEggOptions },
+    ingredientGroups: [{ title: "Unsweetened enriched dough", items: [
+      { name: "All-purpose flour", amount: { numerator: 150 }, unit: "g" },
+      { name: "Large egg", amount: { numerator: 1 }, unit: "egg", note: "about 50g without shell; whole, no whipping" },
+      { name: "2% milk", amount: { numerator: 60 }, unit: "g", note: "lukewarm, not hot" },
+      { name: "Unsalted butter, softened", amount: { numerator: 45 }, unit: "g", note: "soft and pliable, not melted" },
+      { name: "Instant yeast", amount: { numerator: 2 }, unit: "g" },
+      { name: "Fine salt", amount: { numerator: 5, denominator: 2 }, unit: "g" },
+      { name: "Vanilla extract", amount: { numerator: 2 }, unit: "g", note: "optional; omit for savoury waffles" },
+    ] }],
+    method: [
+      "Mix the flour, instant yeast and salt. Add the whole egg, lukewarm milk and optional vanilla. Stir to form a soft dough, then knead until it starts to look smooth and elastic, about 5–8 minutes. A dough hook is convenient; for this small batch you can knead by hand with a scraper.",
+      "Work in the softened butter in small pieces, incorporating each before adding the next. Knead another 5–10 minutes, until smooth, stretchy and tacky rather than pourable. The dough may look messy before it comes together; avoid adding a lot of flour. If very sticky, rest 10 minutes and resume kneading.",
+      "Cover and let rise at room temperature until roughly doubled and visibly airy, about 1½–3 hours depending on temperature. Use the dough's expansion rather than the clock.",
+      "Gently deflate. Divide the one-egg batch into 4 equal balls, roughly 75–80g each. For a scaled batch, use 4 balls per egg. Cover and proof 30–60 minutes until puffy; they need not double again.",
+      "Preheat the iron thoroughly; use medium heat if it is adjustable. Lightly grease the grids if needed. Place one puffy dough ball in the centre and gently close the lid without forcing it. The waffle will be smaller and irregular, rather than filling a round grid.",
+      "Cook until golden brown, set through the centre and easy to release. Start checking around 3–5 minutes; the vintage iron may need longer. Split the first waffle to check for raw dough, then adjust the next cook. A thermometer in the centre should read roughly 190–200°F (88–93°C).",
+      "Move to a wire rack. Assess the crust immediately and after 2 and 5 minutes, plus tenderness of the centre. Serve plain or add toppings on the plate, away from the iron.",
+    ],
+    notes: [
+      "Original experimental formula, not yet tested in your iron. This is a Liège-inspired brioche-style dough waffle without granulated sugar, pearl sugar, honey or syrup in the dough. It will not have the traditional caramelized sugar crust.",
+      "Aim for buttery, tender bread with a lightly crisp surface. A dough waffle may still have more chew than a batter waffle; fluffiness and crispness retention need a real trial.",
+      "All-purpose flour is the baseline. Bread flour can be used if necessary, but may give a chewier result; log it as a variable rather than silently swapping it.",
+      "Overnight option: after kneading, let the dough start rising for 30–60 minutes, then cover and refrigerate 8–16 hours. Next day, divide and shape while cool; let the balls warm and become puffy before cooking, often 1–2 hours. Skip the full room-temperature bulk rise in this route.",
+      "Omitting pearl sugar removes caramelized-sugar residue from this experiment; butter and dough can still leave residue. Once unplugged and cooled enough to handle, use a soft brush or damp cloth, then dry thoroughly. Follow the iron's care instructions and avoid scraping the seasoning with metal.",
+      "Method inspiration: traditional Liège dough waffles and enriched-bread mixing. The formula above is our unsweetened trial, not Anna Olson's recipe.",
+    ],
+    sourceUrl: "https://annaolson.ca/project/liege-waffles/",
   },
 ];
 
@@ -1227,4 +1256,11 @@ everyday.experiments = [
 const overnight = recipes.find(recipe => recipe.id === "overnight-yeasted-waffles")!;
 overnight.experiments = [{ id: "overnight-v1", version: "V1", title: "Friday prep · Saturday cook", status: "proposed", hypothesis: "Long fermentation may give a delicate crust and richer flavour.", changes: "Existing overnight formula, preserved exactly.", observations: "", outcome: "", formula: snapshotFormula(overnight) }];
 const liege = recipes.find(recipe => recipe.id === "liege-waffles")!;
-liege.experiments = [{ id: "liege-v1", version: "V1", title: "Yeasted brioche dough", status: "proposed", concept: true, hypothesis: "Explore a buttery, caramelized, chewy-tender pastry waffle.", changes: "Enriched dough with pearl sugar; quantities still to develop.", observations: "", outcome: "", formula: snapshotFormula(liege) }];
+const originalLiegeConcept = {
+  scale: fixedScale, ingredientGroups: [],
+  notes: ["Original direction: buttery yeasted brioche-style dough with pearl sugar. Quantities and method were not developed.", "Shelved in favour of a no-added-sugar dough trial to avoid caramelized-sugar cleanup."],
+};
+liege.experiments = [
+  { id: "liege-v1", version: "V1", title: "Pearl-sugar concept (shelved)", status: "rejected", concept: true, hypothesis: "Explore a buttery pastry waffle with caramelized sugar.", changes: "Original concept only; no measured formula or test.", observations: "", outcome: "Corey chose to omit sugar to simplify cleaning the vintage iron.", formula: snapshotFormula(originalLiegeConcept) },
+  { id: "liege-v2", version: "V2", title: "Unsweetened brioche-style dough", status: "proposed", hypothesis: "A butter-enriched dough may give a tender pastry-like centre without caramelized-sugar residue.", changes: "Complete one-egg dough formula; no added sugar or pearl sugar. Whole egg, no whipping.", observations: "", outcome: "", formula: snapshotFormula(liege) },
+];

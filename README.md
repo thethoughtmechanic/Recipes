@@ -24,8 +24,9 @@ checks the scaling behavior against representative formulas.
 
 ## Recipe experiments
 
-Collections are optional recipe metadata; Waffles contains Everyday Crispy,
-Overnight Yeasted, and a Liège concept. The existing overnight formula is
+Collections are optional recipe metadata, rendered once as expandable groups
+within the normal recipe grid; Waffles contains Everyday Crispy,
+Overnight Yeasted, and an unsweetened Liège-style dough trial. The existing overnight formula is
 unchanged. Everyday opens on tested V1; V2 remains proposed until cooked.
 
 Every recipe has an Experiment history below its cooking view. Open a snapshot
@@ -42,8 +43,9 @@ history remains in source. Saving failures keep the form open. Corrupt saved
 data is left untouched rather than overwritten.
 
 New source recipes remain in `app/recipes.ts`; optional collections, formula
-labels and seeded snapshots are data-only additions. Liège is deliberately a
-concept without invented quantities. No backend or authentication was added.
+labels and seeded snapshots are data-only additions. Liège-style V2 is a complete no-added-sugar dough experiment with kneading,
+rising, proofing and cooking instructions; it is explicitly untested. The prior
+pearl-sugar concept remains in history as shelved. No backend or authentication was added.
 
 Validation: `pnpm test` builds and runs all scaling and experiment tests;
 `pnpm exec tsc --noEmit` checks types. Browser QA needs the supported Sites
@@ -52,4 +54,4 @@ control-browser environment.
 Artwork: the two new assets in `public/recipes/` were generated with the built-in
 imagegen tool using layered torn-paper food collage, ivory paper, cobalt and
 periwinkle cloth. Everyday depicts round golden batter waffles with butter;
-Liège depicts irregular caramelized brioche waffles with pearl sugar.
+Liège depicts plain golden brioche-style waffles without pearl sugar or glaze.

@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { recipeLibraryEntries } from "../app/library.ts";
 import { recipes } from "../app/recipes.ts";
 import { snapshotFormula, measuredAmount, appendExperiment, notebookFor, preferredRecipe, promoteExperiment, parseNotebooks } from "../app/experiments.ts";
 import { formatExactDecimal, scaleFraction, formatRecipeYield } from "../app/scaling.ts";
@@ -15,8 +16,9 @@ test("waffle collection contains three distinct recipes, with honest validation 
   assert.equal(everyday.experiments[1].status, "proposed");
   assert.match(overnight.formulaLabel, /Untested/);
   const liege = recipes.find(recipe => recipe.id === "liege-waffles");
-  assert.equal(liege.concept, true);
-  assert.equal(liege.ingredientGroups.length, 0);
+  assert.ok(!liege.concept);
+  assert.match(liege.formulaLabel, /Untested/);
+  assert.ok(liege.ingredientGroups.length > 0);
 });
 
 test("V1 and V2 keep exact independent formulas and real observations", () => {
@@ -109,4 +111,42 @@ test("measured quantities preserve repeating source fractions and parse decimal 
   assert.deepEqual(measuredAmount(third, String(85 / 3)), third);
   assert.deepEqual(measuredAmount(third, "28.5"), { numerator: 57, denominator: 2 });
   assert.deepEqual(measuredAmount(third, "1e-3"), { numerator: 1, denominator: 1000 });
+});
+
+test("collections contain their recipes once in the normal library order", () => {
+  const entries = recipeLibraryEntries(recipes);
+  const waffles = entries.find(entry => entry.kind === "collection" && entry.name === "Waffles");
+  assert.equal(waffles.recipes.length, 3);
+  assert.equal(entries[0].kind, "recipe");
+  assert.equal(entries.at(-1), waffles);
+  const ids = entries.flatMap(entry => entry.kind === "recipe" ? [entry.recipe.id] : entry.recipes.map(recipe => recipe.id));
+  assert.equal(ids.length, recipes.length);
+  assert.equal(new Set(ids).size, recipes.length);
+  const filtered = recipeLibraryEntries(recipes.filter(recipe => recipe.id === "liege-waffles"));
+  assert.equal(filtered.length, 1);
+  assert.equal(filtered[0].recipes[0].id, "liege-waffles");
+});
+
+test("Liege has a complete unsweetened dough trial with whole-egg scaling", () => {
+  const liege = recipes.find(recipe => recipe.id === "liege-waffles");
+  const ingredients = liege.ingredientGroups.flatMap(group => group.items);
+  assert.equal(liege.scale.kind, "egg");
+  assert.equal(liege.scale.base.numerator, 1);
+  assert.equal(ingredients.length, 7);
+  assert.ok(!ingredients.some(item => /sugar|honey|syrup/i.test(item.name)));
+  const expected = { "All-purpose flour": 150, "Large egg": 1, "2% milk": 60, "Unsalted butter, softened": 45, "Instant yeast": 2, "Fine salt": 2.5, "Vanilla extract": 2 };
+  for (const [name, amount] of Object.entries(expected)) {
+    const ingredient = byName(liege, name);
+    assert.equal(ingredient.amount.numerator / (ingredient.amount.denominator ?? 1), amount);
+    assert.equal(formatExactDecimal(scaleFraction(ingredient.amount, { numerator: 3 }, liege.scale.base)), String(amount * 3));
+  }
+  assert.equal(formatRecipeYield(liege, { numerator: 2 }), "About 8 small dough waffles");
+  assert.ok(liege.method.length >= 6);
+  assert.match(liege.method.join(" "), /knead|Knead/);
+  assert.match(liege.method.join(" "), /proof/);
+  assert.match(liege.notes.join(" "), /not yet tested/);
+  assert.equal(liege.experiments[0].concept, true);
+  assert.equal(liege.experiments[0].status, "rejected");
+  assert.equal(liege.experiments[1].status, "proposed");
+  assert.deepEqual(liege.experiments[1].formula, snapshotFormula(liege));
 });

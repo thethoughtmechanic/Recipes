@@ -23,6 +23,7 @@ import {
   availableCategories,
   normalizeSearchText,
   recipeSearchText,
+  recipeLibraryEntries,
   stableRecipeNumber,
   type ActiveCategory,
 } from "./library";
@@ -541,8 +542,6 @@ function RecipeLibrary({ onSelect, saved }: { onSelect: (id: string) => void; sa
   const searchRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ActiveCategory>("All");
-  const [collection, setCollection] = useState<string | null>(null);
-  const collections = Array.from(new Set(recipes.map(recipe => recipe.collection).filter((value): value is string => Boolean(value))));
   const normalizedQuery = normalizeSearchText(query.trim());
   const visibleCategories = useMemo(
     () => availableCategories(categories, recipes),
@@ -557,11 +556,52 @@ function RecipeLibrary({ onSelect, saved }: { onSelect: (id: string) => void; sa
         const queryMatch =
           normalizedQuery.length === 0 ||
           recipeSearchText(recipe).includes(normalizedQuery);
-        return categoryMatch && queryMatch && (!collection || recipe.collection === collection);
+        return categoryMatch && queryMatch;
       }),
-    [category, normalizedQuery, collection],
+    [category, normalizedQuery],
   );
-  const isFiltered = category !== "All" || normalizedQuery.length > 0 || Boolean(collection);
+  const isFiltered = category !== "All" || normalizedQuery.length > 0;
+  const renderRecipeCard = (recipe: Recipe, index: number) => (
+<button
+                className={`recipe-card tone-${recipe.tone}`}
+                key={recipe.id}
+                id={`recipe-card-${recipe.id}`}
+                type="button"
+                onClick={() => onSelect(recipe.id)}
+              >
+                <span className="recipe-card-image" aria-hidden="true">
+                  <Image
+                    src={`/recipes/${recipe.id}.webp`}
+                    alt=""
+                    fill
+                    unoptimized
+                    priority={index < 3}
+                    sizes="(max-width: 679px) 108px, (max-width: 979px) 50vw, 33vw"
+                  />
+                </span>
+                <span className="recipe-card-copy">
+                  <span className="recipe-index">
+                    {String(stableRecipeNumber(recipes, recipe.id)).padStart(
+                      2,
+                      "0",
+                    )}{" "}
+                    · {recipe.category}
+                  </span>
+                  <span className="recipe-card-title">{recipe.title}</span>
+                  {preferredRecipe(recipe, notebookFor(recipe, saved)).formulaLabel && <span className="card-formula-status">{preferredRecipe(recipe, notebookFor(recipe, saved)).formulaLabel}</span>}
+                  <span className="recipe-card-tags">
+                    {recipe.tags.slice(0, 3).map((tag) => (
+                      <span className="recipe-tag" key={tag}>
+                        {tag}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+                <span className="card-arrow" aria-hidden="true">
+                  →
+                </span>
+              </button>
+  );
 
   return (
     <main className="recipe-app">
@@ -619,56 +659,14 @@ function RecipeLibrary({ onSelect, saved }: { onSelect: (id: string) => void; sa
           </div>
         </section>
 
-        <section className="collections" aria-label="Recipe collections">
-          {collections.map(name => {
-            const members = recipes.filter(recipe => recipe.collection === name);
-            const active = members.filter(recipe => notebookFor(recipe, saved).experiments.some(experiment => experiment.status === "proposed" && !experiment.concept && !notebookFor(recipe, saved).experiments.some(cook => cook.version === experiment.version && ["tested", "preferred", "rejected"].includes(cook.status)))).length;
-            return <button type="button" className="collection-button" key={name} aria-pressed={collection === name} onClick={() => setCollection(collection === name ? null : name)}><span>{name}</span><small>{members.length} recipes · {active} active {active === 1 ? "experiment" : "experiments"}</small><span aria-hidden="true">{collection === name ? "×" : "→"}</span></button>;
-          })}
-        </section>
         <section className="recipe-grid" aria-live="polite">
           {filteredRecipes.length ? (
-            filteredRecipes.map((recipe, index) => (
-              <button
-                className={`recipe-card tone-${recipe.tone}`}
-                key={recipe.id}
-                id={`recipe-card-${recipe.id}`}
-                type="button"
-                onClick={() => onSelect(recipe.id)}
-              >
-                <span className="recipe-card-image" aria-hidden="true">
-                  <Image
-                    src={`/recipes/${recipe.id}.webp`}
-                    alt=""
-                    fill
-                    unoptimized
-                    priority={index < 3}
-                    sizes="(max-width: 679px) 108px, (max-width: 979px) 50vw, 33vw"
-                  />
-                </span>
-                <span className="recipe-card-copy">
-                  <span className="recipe-index">
-                    {String(stableRecipeNumber(recipes, recipe.id)).padStart(
-                      2,
-                      "0",
-                    )}{" "}
-                    · {recipe.category}
-                  </span>
-                  <span className="recipe-card-title">{recipe.title}</span>
-                  {preferredRecipe(recipe, notebookFor(recipe, saved)).formulaLabel && <span className="card-formula-status">{preferredRecipe(recipe, notebookFor(recipe, saved)).formulaLabel}</span>}
-                  <span className="recipe-card-tags">
-                    {recipe.tags.slice(0, 3).map((tag) => (
-                      <span className="recipe-tag" key={tag}>
-                        {tag}
-                      </span>
-                    ))}
-                  </span>
-                </span>
-                <span className="card-arrow" aria-hidden="true">
-                  →
-                </span>
-              </button>
-            ))
+            recipeLibraryEntries(filteredRecipes).map((entry, index) => entry.kind === "recipe"
+              ? renderRecipeCard(entry.recipe, index)
+              : <details className="recipe-collection" key={entry.name}>
+                  <summary><span className="collection-title">{entry.name}</span><span className="collection-count">{entry.recipes.length} recipes</span><span className="collection-chevron" aria-hidden="true">⌄</span></summary>
+                  <div className="recipe-grid collection-recipes">{entry.recipes.map(renderRecipeCard)}</div>
+                </details>)
           ) : (
             <div className="empty-state">
               <p>No recipes match. Try another ingredient or category.</p>
@@ -676,7 +674,6 @@ function RecipeLibrary({ onSelect, saved }: { onSelect: (id: string) => void; sa
                 searchRef.current?.focus();
                 setQuery("");
                 setCategory("All");
-                setCollection(null);
               }}>Clear filters</button>
             </div>
           )}
